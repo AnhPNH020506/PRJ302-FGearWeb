@@ -238,33 +238,38 @@
                     
                     <!-- [ Bắt đầu vòng lặp Java/JSTL ở đây ] -->
                     <%
+                        //ép kiểu dữ liệu
+                        ArrayList<ProductDTO> list = (ArrayList<ProductDTO>)request.getAttribute("products");
                         String keyword = request.getParameter("keyword");
-                        System.out.println(keyword);
-                        ProductDAO pDao = new ProductDAO();
-                        String new_keyword = "%" + keyword + "%";
-                        ArrayList<ProductDTO> prdList = pDao.searchAllById(keyword);
-                        
-                        System.out.println("Ủa rỗng à");
-                        for (ProductDTO prd : prdList) {
-                                System.out.println("hello 12345");
+                        for (ProductDTO product : list) {
+                                
                     %>
                     
                     <!-- SẢN PHẨM MẪU 1 -->
                     <div class="col">
-                        <a href="#" class="card h-100 product-card border-light shadow-sm">
-                            <!-- Khung ảnh tỉ lệ 1:1 -->
-                            <div class="ratio ratio-1x1 bg-white p-3">
-                                <img src="https://via.placeholder.com/300x300.png?text=ASUS+TUF" alt="Laptop Gaming ASUS" style="object-fit: contain;">
+                        <div class="card h-100 product-card border-light shadow-sm">
+                            <div class="ratio ratio-1x1 bg-light rounded-top d-flex align-items-center justify-content-center text-secondary">
+                                <!-- Chỗ này để img src từ DB -->
+                                <img src="<%= product.getThumbnail_url()%>" alt="alt"/>
                             </div>
-                            <!-- Thông tin sản phẩm -->
-                            <div class="card-body d-flex flex-column p-3 pt-0">
-                                <div class="text-clamp-2 mb-2">Laptop Gaming ASUS TUF F15 FX506HF HN014W</div>
+                            <div class="card-body d-flex flex-column p-2">
+                                <h6 class="card-title text-truncate placeholder-text"><%= product.getName()%></h6>
                                 <div class="mt-auto">
-                                    <div class="text-decoration-line-through text-muted small">21.000.000đ</div>
-                                    <div class="fw-bold text-danger fs-6">18.990.000đ</div>
+                                    <%
+                                        if (product.getSale_price() != 0) {
+                                    %>
+                                    <div class="text-decoration-line-through text-muted small placeholder-text"><%= product.getFormattedPrice()%></div>
+                                    <div class="fw-bold text-danger placeholder-text"><%= product.getFormattedSale_price()%></div>
+                                    <%
+                                    } else {
+                                    %>
+                                    <div class="fw-bold text-danger placeholder-text"><%= product.getFormattedPrice()%></div>
+                                    <%
+                                        }
+                                    %>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     </div>
 
                     

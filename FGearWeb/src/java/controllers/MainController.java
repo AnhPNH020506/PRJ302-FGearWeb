@@ -38,7 +38,7 @@ public class MainController extends HttpServlet {
 //            String keyword = request.getParameter("keyword");
 //            System.out.println(keyword);
 
-            url = "pages.jsp";
+            url = "ProductController";
         }
         
         

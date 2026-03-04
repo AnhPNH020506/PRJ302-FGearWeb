@@ -7,6 +7,7 @@ package controllers;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,9 +32,40 @@ public class ProductController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    protected void doShowAllProductsByCategory (HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        //
+        String keyword = request.getParameter("keyword");
+        ProductDAO pDao = new ProductDAO();
+        ArrayList<ProductDTO> result = pDao.searchAllById(keyword);
+        String url = "";
+        if (result == null) {
+            url = "error.jsp";
+        } else {
+            url = "pages.jsp";
+            request.setAttribute("products", result);
+            System.out.println(request.getAttribute("products"));
+        }
+        
+        //Chuyển trang
+        RequestDispatcher rd = request.getRequestDispatcher(url);
+        rd.forward(request, response);
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("Hello mấy con vợ");
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        
+        //
+        String action = request.getParameter("action");
+        if(action.equals("ShowProduct")){
+            doShowAllProductsByCategory(request, response);
+        }
     }
 
     /**
@@ -105,55 +137,55 @@ public class ProductController extends HttpServlet {
     }// </editor-fold>
     
                 //SUPPORTING METHODS
-    private void searchProductsBySubCategory(HttpServletRequest request, HttpServletResponse response) {
-        response.setContentType("text/plain;charset=UTF-8"); //hiện Tiếng Việt
-        
-        String sub_id = request.getParameter("sub_id");
-        
-        if (sub_id == null) {
-            sub_id = "";
-        }
-        
-        try {
-            PrintWriter out = response.getWriter();
-            ProductDAO dao = new ProductDAO();
-            ArrayList<ProductDTO> res = dao.searchBySubCategory(sub_id);
-            
-            if(res.isEmpty()) {
-                out.println("Không tìm thấy sản phẩm nào");
-            } else {
-                for (ProductDTO prd : res) {
-                    out.println(prd.toString());
-                }
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    private void searchProductsBySubCategory(HttpServletRequest request, HttpServletResponse response) {
+//        response.setContentType("text/plain;charset=UTF-8"); //hiện Tiếng Việt
+//        
+//        String sub_id = request.getParameter("sub_id");
+//        
+//        if (sub_id == null) {
+//            sub_id = "";
+//        }
+//        
+//        try {
+//            PrintWriter out = response.getWriter();
+//            ProductDAO dao = new ProductDAO();
+//            ArrayList<ProductDTO> res = dao.searchBySubCategory(sub_id);
+//            
+//            if(res.isEmpty()) {
+//                out.println("Không tìm thấy sản phẩm nào");
+//            } else {
+//                for (ProductDTO prd : res) {
+//                    out.println(prd.toString());
+//                }
+//            }
+//            
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
     
-    private void findSpecificProductByItsId(HttpServletRequest request, HttpServletResponse response) {
-        response.setContentType("text/plain;charset=UTF-8"); //hiện Tiếng Việt
-        
-        String product_id = request.getParameter("product_id");
-        
-        if (product_id == null) {
-            product_id = "";
-        }
-        
-        try {
-            PrintWriter out = response.getWriter();
-            ProductDAO dao = new ProductDAO();
-            ProductDTO res = dao.searchById(product_id);
-            
-            if(res == null) {
-                out.println("Không tìm thấy sản phẩm nào");
-            } else {
-               out.println(res.toString());
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    private void findSpecificProductByItsId(HttpServletRequest request, HttpServletResponse response) {
+//        response.setContentType("text/plain;charset=UTF-8"); //hiện Tiếng Việt
+//        
+//        String product_id = request.getParameter("product_id");
+//        
+//        if (product_id == null) {
+//            product_id = "";
+//        }
+//        
+//        try {
+//            PrintWriter out = response.getWriter();
+//            ProductDAO dao = new ProductDAO();
+//            ProductDTO res = dao.searchById(product_id);
+//            
+//            if(res == null) {
+//                out.println("Không tìm thấy sản phẩm nào");
+//            } else {
+//               out.println(res.toString());
+//            }
+//            
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

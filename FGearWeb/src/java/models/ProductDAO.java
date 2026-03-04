@@ -16,7 +16,8 @@ import utils.DbUtils;
  */
 public class ProductDAO {
 
-    public ProductDAO() {
+    public ProductDAO() { 
+        //constructor
     }
     
             //SEARCH
@@ -25,10 +26,10 @@ public class ProductDAO {
         
         try {
             Connection conn = DbUtils.getConnection();
-            String sql = "SELECT * FROM product WHERE product_id like ?";
+            String sql = "SELECT * FROM product WHERE product_id LIKE ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             //  ->Dòng lệnh giúp biên dịch câu lệnh SQL
-            pst.setString(1, id);
+            pst.setString(1, "%" + id + "%");
             //  ->set thêm id vào câu lệnh sql
             ResultSet rs =  pst.executeQuery();
             
@@ -57,8 +58,11 @@ public class ProductDAO {
             e.printStackTrace();
             return null;
         }
-        
-        return res;
+        if (res.isEmpty()){
+            return null;
+        } else {
+            return res;
+        }
     }
     
     public ArrayList<ProductDTO> searchBySubCategory(String sub_id) {
@@ -101,7 +105,10 @@ public class ProductDAO {
         return result;
     }
     
-    
+    public ProductDTO searchById(String product_id) {
+        ProductDTO res = new ProductDTO();
+        return res;
+    }
     //create
     
     //update
