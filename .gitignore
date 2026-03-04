@@ -31,3 +31,19 @@ nbdist/
 
 FGearWeb/src/java/utils/DbUtils.java
 FGearWeb/nbproject/project.properties
+FGearWeb/src/java/utils/DbUtils.java
+
+# Thư mục chứa cấu hình cá nhân của từng máy (bắt buộc ignore)
+nbproject/private/
+
+# Các thư mục chứa file đã biên dịch và file chạy (không bao giờ đẩy code đã build lên Git)
+build/
+nbbuild/
+dist/
+nbdist/
+
+# Các file Ant build tự sinh (thường gây cảnh báo và xung đột khi làm việc nhóm)
+nbproject/build-impl.xml
+nbproject/genfiles.properties
+nbproject/Makefile-*.mk
+nbproject/Package-*.bash
