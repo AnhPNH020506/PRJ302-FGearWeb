@@ -272,52 +272,11 @@
                                 <i class="fa-solid fa-user fs-5"></i>
                                 <span class="d-none d-lg-block">Đăng nhập</span>
                             </a>
-
                         </div>
-
-
-
                     </div>
-
-
-
                 </div>
             </div>
         </header>
-        <!-- -->
-        <div class="login-wrapper">
-
-            <div class="login-box">
-                <div class="login-header">
-                    <img src="${pageContext.request.contextPath}/assets/img/fgear-logo.png" class="login-logo">
-
-                    <h2>Đăng nhập tài khoản</h2>
-                </div>
-
-                
-                <form action="UserController" method="post">
-                    <input type="hidden" name="action" value="login">
-                    <div class="input-group">
-                        <label for="email">Email / Số điện thoại</label>
-                        <input type="text" id="email" name="email" placeholder="Nhập email hoặc số điện thoại" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="password">Mật khẩu</label>
-                        <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
-                    </div>
-
-                    <div class="login-actions">
-                        <button type="submit" class="btn-login">Đăng nhập</button>
-                    </div>
-
-                    <div class="login-links">
-                        <a href="forgot.jsp">Quên mật khẩu?</a>
-                        <span> | </span>
-                        <a href="register.jsp">Tạo tài khoản mới</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+        Chỗ này hiện lỗi
     </body>
 </html>

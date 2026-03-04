@@ -139,62 +139,55 @@
                         <button class="btn btn-glass d-flex align-items-center gap-2 menutab-btn">
                             <i class="fa-solid fa-bars"></i> Danh mục
                         </button>
-                        
+                            
                             <div class="main-menu sidebar-menu">
                                 <nav class="megamenu-nav">
                                     <ul class="megamenu-nav-main">
                                         <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
+                                            <a class="megamenu-link" href="MainController?action=ShowProduct&keyword=LPT">
                                                 <span class="megamenu-name">Laptop</span>
                                                 <span class="megamenu-ic-right">❯</span>
                                             </a>
                                         </li>
 
                                         <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
-                                                <span class="megamenu-name">PC FGear</span>
-                                                <span class="megamenu-ic-right">❯</span>
-                                            </a>
-                                        </li>
-
-                                        <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
-                                                <span class="megamenu-name">Mainboard</span>
-                                                <span class="megamenu-ic-right">❯</span>
-                                            </a>
-                                        </li>
-
-                                        <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
+                                            <a class="megamenu-link" href="MainController?action=ShowProduct&keyword=CPU">
                                                 <span class="megamenu-name">CPU</span>
                                                 <span class="megamenu-ic-right">❯</span>
                                             </a>
                                         </li>
 
                                         <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
+                                            <a class="megamenu-link" href="MainController?action=ShowProduct&keyword=VGA">
                                                 <span class="megamenu-name">VGA</span>
                                                 <span class="megamenu-ic-right">❯</span>
                                             </a>
                                         </li>
 
                                         <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
-                                                <span class="megamenu-name">Case</span>
+                                            <a class="megamenu-link" href="MainController?action=ShowProduct&keyword=KEY">
+                                                <span class="megamenu-name">Bàn Phím</span>
                                                 <span class="megamenu-ic-right">❯</span>
                                             </a>
                                         </li>
-
+                                        
                                         <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
-                                                <span class="megamenu-name">Nguồn</span>
+                                            <a class="megamenu-link" href="MainController?action=ShowProduct&keyword=MSE">
+                                                <span class="megamenu-name">Chuột</span>
                                                 <span class="megamenu-ic-right">❯</span>
                                             </a>
                                         </li>
-
+                                        
                                         <li class="megamenu-item">
-                                            <a class="megamenu-link" href="#">
-                                                <span class="megamenu-name">Tản nhiệt</span>
+                                            <a class="megamenu-link" href="MainController?action=ShowProduct&keyword=RAM">
+                                                <span class="megamenu-name">RAM</span>
+                                                <span class="megamenu-ic-right">❯</span>
+                                            </a>
+                                        </li>
+                                        
+                                        <li class="megamenu-item">
+                                            <a class="megamenu-link" href="MainController?action=ShowProduct&keyword=MON">
+                                                <span class="megamenu-name">Màn hình</span>
                                                 <span class="megamenu-ic-right">❯</span>
                                             </a>
                                         </li>
@@ -333,12 +326,7 @@
                             </div>
                         </div>
 
-                        <!-- (Demo 4 item rỗng khác để giữ layout đẹp khi chưa có data thật)
-                        <div class="col"><div class="card h-100 product-card border-light shadow-sm"><div class="ratio ratio-1x1 bg-light d-flex align-items-center justify-content-center text-secondary"><i class="fa-solid fa-laptop fs-1"></i></div><div class="card-body d-flex flex-column p-2"><h6 class="card-title text-truncate placeholder-text">Tên Laptop...</h6><div class="mt-auto"><div class="text-decoration-line-through text-muted small placeholder-text">Giá cũ...</div><div class="fw-bold text-danger placeholder-text">Giá mới...</div></div></div></div></div>
-                        <div class="col"><div class="card h-100 product-card border-light shadow-sm"><div class="ratio ratio-1x1 bg-light d-flex align-items-center justify-content-center text-secondary"><i class="fa-solid fa-laptop fs-1"></i></div><div class="card-body d-flex flex-column p-2"><h6 class="card-title text-truncate placeholder-text">Tên Laptop...</h6><div class="mt-auto"><div class="text-decoration-line-through text-muted small placeholder-text">Giá cũ...</div><div class="fw-bold text-danger placeholder-text">Giá mới...</div></div></div></div></div>
-                        <div class="col"><div class="card h-100 product-card border-light shadow-sm"><div class="ratio ratio-1x1 bg-light d-flex align-items-center justify-content-center text-secondary"><i class="fa-solid fa-laptop fs-1"></i></div><div class="card-body d-flex flex-column p-2"><h6 class="card-title text-truncate placeholder-text">Tên Laptop...</h6><div class="mt-auto"><div class="text-decoration-line-through text-muted small placeholder-text">Giá cũ...</div><div class="fw-bold text-danger placeholder-text">Giá mới...</div></div></div></div></div>
-                        <div class="col"><div class="card h-100 product-card border-light shadow-sm"><div class="ratio ratio-1x1 bg-light d-flex align-items-center justify-content-center text-secondary"><i class="fa-solid fa-laptop fs-1"></i></div><div class="card-body d-flex flex-column p-2"><h6 class="card-title text-truncate placeholder-text">Tên Laptop...</h6><div class="mt-auto"><div class="text-decoration-line-through text-muted small placeholder-text">Giá cũ...</div><div class="fw-bold text-danger placeholder-text">Giá mới...</div></div></div></div></div>
-                        -->
+                        
                         <%
                             } //kết thúc vòng lặp
                         %>

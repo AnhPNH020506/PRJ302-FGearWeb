@@ -30,6 +30,7 @@ nbdist/
 .nb-gradle/
 
 FGearWeb/src/java/utils/DbUtils.java
+FGearWeb/nbproject/project.properties
 FGearWeb/src/java/utils/DbUtils.java
 
 # Thư mục chứa cấu hình cá nhân của từng máy (bắt buộc ignore)

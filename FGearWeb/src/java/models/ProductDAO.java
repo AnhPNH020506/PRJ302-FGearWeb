@@ -16,19 +16,20 @@ import utils.DbUtils;
  */
 public class ProductDAO {
 
-    public ProductDAO() {
+    public ProductDAO() { 
+        //constructor
     }
     
             //SEARCH
-    public ProductDTO searchById(String id) { 
-        ProductDTO prd = null;
+    public ArrayList<ProductDTO> searchAllById(String id) { 
+        ArrayList<ProductDTO> res = new ArrayList<>();
         
         try {
             Connection conn = DbUtils.getConnection();
-            String sql = "SELECT * FROM product WHERE product_id=?";
+            String sql = "SELECT * FROM product WHERE product_id LIKE ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             //  ->Dòng lệnh giúp biên dịch câu lệnh SQL
-            pst.setString(1, id);
+            pst.setString(1, "%" + id + "%");
             //  ->set thêm id vào câu lệnh sql
             ResultSet rs =  pst.executeQuery();
             
@@ -46,15 +47,22 @@ public class ProductDAO {
                 String sub_id = rs.getString("sub_id");
 
                 // Tạo đối tượng ProductDTO (Giả sử bạn đã có constructor đầy đủ tham số theo thứ tự này)
-                prd = new ProductDTO(product_id, name, price, sale_price, slug, 
+                ProductDTO prd = new ProductDTO(product_id, name, price, sale_price, slug, 
                                                     thumbnail_url, warranty_period, brand, 
                                                     status, specifications, sub_id);
+                res.add(prd);
             }
+            if (pst != null) pst.close();
+            if (rs != null) rs.close();
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
-        
-        return prd;
+        if (res.isEmpty()){
+            return null;
+        } else {
+            return res;
+        }
     }
     
     public ArrayList<ProductDTO> searchBySubCategory(String sub_id) {
@@ -92,11 +100,15 @@ public class ProductDAO {
             if (rs != null) rs.close();
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
         return result;
     }
     
-    
+    public ProductDTO searchById(String product_id) {
+        ProductDTO res = new ProductDTO();
+        return res;
+    }
     //create
     
     //update
