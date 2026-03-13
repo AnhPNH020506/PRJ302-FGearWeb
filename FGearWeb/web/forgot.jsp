@@ -1,6 +1,6 @@
 <%-- 
-    Document   : register
-    Created on : Mar 1, 2026, 8:34:40 AM
+    Document   : forgot
+    Created on : Mar 1, 2026, 10:29:24 AM
     Author     : User
 --%>
 
@@ -10,71 +10,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-        <!-- Bootstrap & Font Awesome (optional) -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-        <!-- CSS -->
-        <style>
-            /* Nền xám toàn trang */
-            body {
-                background-color: #f5f5f5;
-            }
-
-            /* Wrapper căn giữa */
-            .register-wrapper {
-                min-height: 80vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            /* Card form */
-            .register-wrapper form {
-                background: white;
-                width: 400px;
-                padding: 40px 35px;
-                border-radius: 12px;
-                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            }
-
-            /* Label */
-            .register-wrapper label {
-                font-weight: 500;
-                margin-bottom: 6px;
-            }
-
-            /* Input */
-            .register-wrapper input {
-                width: 100%;
-                padding: 12px;
-                border-radius: 6px;
-                border: 1px solid #ddd;
-                margin-bottom: 20px;
-                outline: none;
-                transition: 0.3s;
-            }
-
-            .register-wrapper input:focus {
-                border-color: #ff6700;
-                box-shadow: 0 0 0 2px rgba(255,103,0,0.2);
-            }
-
-            /* Button */
-            .btn-register {
-                width: 100%;
-                padding: 12px;
-                background-color: #1677ff;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-weight: 600;
-                transition: 0.3s;
-            }
-
-            .btn-register:hover {
-                background-color: #0f5ed7;
-            }
-            /* Tùy chỉnh Header */
+    </head>
+    <style>
+        /* Tùy chỉnh Header */
             .bg-gearvn {
                 background-color: #ff6700 !important;
             }
@@ -88,9 +28,7 @@
             .btn-glass:hover {
                 background-color: rgba(255,255,255,0.3);
             }
-        </style>
-
-    </head>
+    </style>
     <body>
         <!-- 1. HEADER (Sử dụng Flexbox Utilities của Bootstrap) -->
         <header class="bg-gearvn sticky-top shadow-sm py-2">
@@ -148,53 +86,15 @@
                 </div>
             </div>
         </header>
-        <div class="register-wrapper"> 
-            <form action="UserController" method="post">
-                <input type="hidden" name="action" value="register">
-
-                <h3 class="text-center mb-4">Tạo tài khoản</h3>
-
-                <div class="register-input">
-                    <label>Email / Số điện thoại</label>
-                    <input type="text" name="email"
-                           placeholder="Nhập email hoặc số điện thoại" required>
-                </div> 
-
-                <div class="register-name">
-                    <label>Tên</label>
-                    <input type="text" name="nameRegister"
-                           placeholder="Nhập tên tài khoản" required>
-                </div>
-
-                <div class="register-group">
-                    <label>Mật khẩu</label>
-                    <input type="password" name="password"
-                           placeholder="Nhập mật khẩu" required>
-                </div>
-                <!-- Confirm password -->
-                <div class="register-group">
-                    <label>Nhập lại mật khẩu</label>
-                    <input type="password" name="confirmPassword"
-                           placeholder="Nhập lại mật khẩu" required>
-                </div>
-                <!-- message -->
-                <%
-                    String msg = (String) request.getAttribute("message");
-                    if (msg != null) {
-                %>
-                <div style="color:red; font-size: 14px; margin-bottom: 10px;">
-                    <%=msg%>
-                </div>
-                <%
-                }
-                %>
-
-                <div class="register-action">
-                    <button type="submit" class="btn-register">
-                        Đăng ký
-                    </button> 
-                </div>
-            </form>
+        <div class="forgot-wrapper">
+        <form action="UserController" method="post">
+            <input type="hidden" name="action" value="forgot">
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <button type="submit" class="btn-login"> Gửi mã xác nhận </button>
+        </form>
         </div>
     </body>
 </html>

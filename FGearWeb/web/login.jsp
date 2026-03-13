@@ -216,6 +216,15 @@
                 margin-bottom: 12px;
                 display: inline-block;
             }
+            .success-msg{
+                color:#28a745;
+                font-weight:500;
+            }
+
+            .error-msg{
+                color:#dc3545;
+                font-weight:500;
+            }
 
 
 
@@ -292,9 +301,10 @@
                     <img src="${pageContext.request.contextPath}/assets/img/fgear-logo.png" class="login-logo">
 
                     <h2>Đăng nhập tài khoản</h2>
+
                 </div>
 
-                
+
                 <form action="UserController" method="post">
                     <input type="hidden" name="action" value="login">
                     <div class="input-group">
@@ -306,10 +316,24 @@
                         <label for="password">Mật khẩu</label>
                         <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
                     </div>
+                    <%
+                        String success = (String) request.getAttribute("success");
+                        String error = (String) request.getAttribute("error");
+                    %>
+
+                    <% if (success != null) {%>
+                    <p class="success-msg"><%=success%></p>
+                    <% } %>
+
+                    <% if (error != null) {%>
+                    <p class="error-msg"><%=error%></p>
+                    <% }%>
 
                     <div class="login-actions">
                         <button type="submit" class="btn-login">Đăng nhập</button>
                     </div>
+
+
 
                     <div class="login-links">
                         <a href="forgot.jsp">Quên mật khẩu?</a>

@@ -31,40 +31,62 @@ public class UserController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        
+
         String url = "";
         HttpSession session = request.getSession();
-        
+
 //        System.out.println(request.getServletPath())
         String action = request.getParameter("action");
         System.out.println(action);
-        
+
         if (action.equals("login") && session.getAttribute("user") == null) {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             //
             UserDAO udao = new UserDAO();
             UserDTO user = udao.login(email, password);
-            
+
             if (user != null) {
                 url = "index.jsp";
                 session.setAttribute("user", user);
             } else {
                 url = "login.jsp";
-                request.setAttribute("message", "Invalid email or password");
+                request.setAttribute("error", "Invalid email or password");
             }
 //            session.setAttribute("user", user) DÒNG NÀY QUAN TRỌNG
-        } else if (action.equals("logout")) {
+        }/*REGISTER*/ else if (action.equals("register")) {
+            String email = request.getParameter("email");
+            String name = request.getParameter("nameRegister");
+            String password = request.getParameter("password");
+            String confirm = request.getParameter("confirmPassword");
+            UserDAO udao = new UserDAO();
+            if (!password.equals(confirm)) {
+                request.setAttribute("message", "Mật khẩu không trùng khớp ");
+                //GIỮ LẠI DỮ LIỆU 
+                request.setAttribute("email", email);
+                request.setAttribute("nameRegister", name);
+                url = "register.jsp";
+            } else {
+                boolean check = udao.register(email, name, password);
+                if (check) {
+                    request.setAttribute("success", "Đăng kí thành công! Hãy đăng nhập.");
+                   url = "login.jsp";
+                } else {
+                    request.setAttribute("error", "Đăng kí không thành công");
+                    url = "register.jsp";
+                }
+            }
+        }/*LOGOUT*/ else if (action.equals("logout")) {
             session.invalidate();
             //url = "index.jsp";
             response.sendRedirect("index.jsp");
             return;
         }
-        
+
         RequestDispatcher rd = request.getRequestDispatcher(url);
         rd.forward(request, response);
     }
