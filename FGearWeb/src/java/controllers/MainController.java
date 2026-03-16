@@ -30,18 +30,23 @@ public class MainController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        
+
         String action = request.getParameter("action");
         String url = "index.jsp";
-        
+
         if (action.contains("Product")) {
 //            String keyword = request.getParameter("keyword");
 //            System.out.println(keyword);
 
             url = "ProductController";
         }
-        
-        
+        if (action.equals("sendCode")
+                || action.equals("verifyCode")
+                || action.equals("resetPassword")) {
+
+            url = "ForgotPasswordController";
+        }
+
         RequestDispatcher rd = request.getRequestDispatcher(url);
         rd.forward(request, response);
     }

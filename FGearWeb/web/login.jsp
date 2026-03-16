@@ -294,7 +294,7 @@
                     <h2>Đăng nhập tài khoản</h2>
                 </div>
 
-                
+
                 <form action="UserController" method="post">
                     <input type="hidden" name="action" value="login">
                     <div class="input-group">
@@ -306,14 +306,17 @@
                         <label for="password">Mật khẩu</label>
                         <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
                     </div>
-
+                    <!-- HIỂN THỊ LỖI -->
+                    <div style="color:red; text-align:center; margin-bottom:10px;">
+                        ${message}
+                    </div>
                     <div class="login-actions">
                         <button type="submit" class="btn-login">Đăng nhập</button>
                     </div>
 
                     <div class="login-links">
-                        <a href="forgot.jsp">Quên mật khẩu?</a>
-                        <span> | </span>
+                        <a href="forgotPassword.jsp">Quên mật khẩu?</a>
+
                         <a href="register.jsp">Tạo tài khoản mới</a>
                     </div>
                 </form>
