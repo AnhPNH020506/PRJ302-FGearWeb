@@ -5,7 +5,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import models.UserDAO;
 import models.UserDTO;
+import utils.HashPasswordUtils;
 
 /**
  *
@@ -46,9 +46,11 @@ public class UserController extends HttpServlet {
         if (action.equals("login") && session.getAttribute("user") == null) {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
-            //
+
+            String hashedPassword = HashPasswordUtils.hashPassword(password);
+
             UserDAO udao = new UserDAO();
-            UserDTO user = udao.login(email, password);
+            UserDTO user = udao.login(email, hashedPassword);
 
             if (user != null) {
                 url = "index.jsp";
@@ -71,10 +73,34 @@ public class UserController extends HttpServlet {
                 request.setAttribute("nameRegister", name);
                 url = "register.jsp";
             } else {
-                boolean check = udao.register(email, name, password);
+                String hashedPassword = HashPasswordUtils.hashPassword(password);
+
+                boolean check = udao.register(email, name, hashedPassword);
+
                 if (check) {
-                    request.setAttribute("success", "Đăng kí thành công! Hãy đăng nhập.");
-                   url = "login.jsp";
+
+                    // gửi mail async (không làm chậm web)
+                    new Thread(() -> {
+                        try {
+
+                            String subject = "Welcome to FGear 🎉";
+
+                            String content
+                                    = "Xin chào " + name + ",\n\n"
+                                    + "Tài khoản của bạn đã được đăng ký thành công tại FGear.\n\n"
+                                    + "Bạn có thể đăng nhập và bắt đầu mua sắm.\n\n"
+                                    + "Trân trọng,\n"
+                                    + "FGear Team";
+                            //EmailUtils.sendEmail(email, subject, content);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+
+                    request.setAttribute("success", "Đăng kí thành công! Hãy kiểm tra email.");
+                    url = "login.jsp";
+
                 } else {
                     request.setAttribute("error", "Đăng kí không thành công");
                     url = "register.jsp";
