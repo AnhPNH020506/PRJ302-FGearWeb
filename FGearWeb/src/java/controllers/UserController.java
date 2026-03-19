@@ -48,9 +48,6 @@ public class UserController extends HttpServlet {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
 
-            //FIX CỨNG PASSWORD CHO LOGIN ADMIN
-            //      admin@fgear.com
-            //      admin123
             String hashedPassword = HashPasswordUtils.hashPassword(password);
             System.out.println(hashedPassword);
             
