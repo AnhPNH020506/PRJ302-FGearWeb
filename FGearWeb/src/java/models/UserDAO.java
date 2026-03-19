@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import utils.DbUtils;
+import utils.HashPasswordUtils;
 
 /**
  *
@@ -24,11 +25,16 @@ public class UserDAO {
 
     public UserDTO login(String email, String password) {
         UserDTO user = searchByEmail(email);
-        if (user != null && user.getPassword().equals(password)) {
-            return user;
-        } else {
-            return null;
+
+        if (user != null) {
+            String hashedInput = HashPasswordUtils.hashPassword(password);
+
+            if (user.getPassword().equals(hashedInput)) {
+                return user;
+            }
         }
+
+        return null;
     }
 
     public UserDTO searchByEmail(String email) {
@@ -89,30 +95,31 @@ public class UserDAO {
 
         return false;
     }
+
     public boolean checkEmail(String email) {
 
-    String sql = "SELECT email FROM Users WHERE email=?";
+        String sql = "SELECT email FROM Users WHERE email=?";
 
-    try {
+        try {
 
-        Connection conn = DbUtils.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
+            Connection conn = DbUtils.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
 
-        ps.setString(1, email);
+            ps.setString(1, email);
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            return true;
+            if (rs.next()) {
+                return true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return false;
     }
 
-    return false;
-    }
-    
     public boolean register(String email, String name, String password) {
         boolean check = false;
         String sql = "INSERT INTO Users(email, name, password) VALUES (?, ?, ?)";
@@ -121,9 +128,11 @@ public class UserDAO {
             Connection conn = DbUtils.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
 
+            String hashed = HashPasswordUtils.hashPassword(password);
+
             ps.setString(1, email);
             ps.setString(2, name);
-            ps.setString(3, password);
+            ps.setString(3, hashed);
 
             int result = ps.executeUpdate();
 

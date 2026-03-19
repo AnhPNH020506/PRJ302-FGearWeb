@@ -5,6 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import models.UserDAO;
 import utils.EmailUtils;
+import utils.HashPasswordUtils;
 
 public class ForgotPasswordController extends HttpServlet {
 
@@ -54,7 +55,7 @@ public class ForgotPasswordController extends HttpServlet {
 
         try {
 
-            EmailUtils.sendEmail(email, code);
+            EmailUtils.sendEmail(email, "Your verification code", "Your code is: " + code);
 
             request.setAttribute("msg", "Verification code sent to your email!");
             request.getRequestDispatcher("verifyCode.jsp").forward(request, response);
@@ -129,7 +130,8 @@ public class ForgotPasswordController extends HttpServlet {
 
         UserDAO dao = new UserDAO();
 
-        boolean check = dao.updatePassword(email, password);
+        String hashed = HashPasswordUtils.hashPassword(password);
+        boolean check = dao.updatePassword(email, hashed);
 
         if (check) {
 

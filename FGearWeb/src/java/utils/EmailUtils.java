@@ -9,8 +9,8 @@ import javax.mail.*;
 import javax.mail.internet.*;
  
 public class EmailUtils {
-    public static void sendEmail(String toEmail, String code) throws Exception {
-
+   public static void sendEmail(String to, String subject, String content) {
+    try {
         final String fromEmail = "fgearweb.noreply@gmail.com";
         final String password = "ngnm hpfm pzfr xbcf";
 
@@ -21,20 +21,27 @@ public class EmailUtils {
         props.put("mail.smtp.starttls.enable", "true");
 
         Session session = Session.getInstance(props,
-            new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(fromEmail, password);
-                }
-            });
+                new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, password);
+            }
+        });
 
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(fromEmail));
-        message.setRecipients(Message.RecipientType.TO,
-                InternetAddress.parse(toEmail));
-        message.setSubject("Password Reset Code");
+        message.setRecipients(
+                Message.RecipientType.TO,
+                InternetAddress.parse(to)
+        );
 
-        message.setText("Your verification code is: " + code);
+        message.setSubject(subject);
+        message.setText(content);
 
         Transport.send(message);
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
 }
+}
+

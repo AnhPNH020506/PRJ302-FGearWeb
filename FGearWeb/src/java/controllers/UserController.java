@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import models.UserDAO;
 import models.UserDTO;
+import utils.EmailUtils;
 import utils.HashPasswordUtils;
 
 /**
@@ -95,7 +96,7 @@ public class UserController extends HttpServlet {
                                     + "Bạn có thể đăng nhập và bắt đầu mua sắm.\n\n"
                                     + "Trân trọng,\n"
                                     + "FGear Team";
-                            //EmailUtils.sendEmail(email, subject, content);
+                            EmailUtils.sendEmail(email, subject, content);
 
                         } catch (Exception e) {
                             e.printStackTrace();
