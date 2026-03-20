@@ -40,6 +40,10 @@ public class MainController extends HttpServlet {
 
             url = "ProductController";
         }
+        if (action.contains("Cart")){
+            url = "OrderController";
+        }
+        
         if (action.equals("sendCode")
                 || action.equals("verifyCode")
                 || action.equals("resetPassword")) {

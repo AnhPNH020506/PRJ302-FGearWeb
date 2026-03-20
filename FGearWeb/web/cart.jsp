@@ -66,6 +66,7 @@
         <jsp:include page="header.jsp" />
         
         <!-- NỘI DUNG GIỎ HÀNG CỦA BẠN SẼ CODE Ở ĐÂY -->
+            
         <div class="container bg-white p-4 rounded shadow-sm mt-4 mb-4" style="max-width: 800px;">
         <!-- Tiêu đề giỏ hàng -->
             <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
@@ -74,6 +75,10 @@
             </div>
 
             <!-- SẢN PHẨM SỐ 1 -->
+            <%
+                OrdersDAO oDao = new OrdersDAO();
+                //OrdersDTO orders = oDao.searchAllOrdersByUserId()
+            %>
             <div class="cart-item border-bottom py-3">
                 <div class="row align-items-center">
                     <!-- Cột 1: Checkbox & Ảnh -->

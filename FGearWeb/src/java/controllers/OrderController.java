@@ -6,10 +6,16 @@ package controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import models.OrdersDAO;
+import models.OrdersDTO;
+import models.ProductDAO;
+import models.ProductDTO;
 
 /**
  *
@@ -26,21 +32,39 @@ public class OrderController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    protected void doAddProduct(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        //
+        String keyword = request.getParameter("keyword");
+        OrdersDAO oDao = new OrdersDAO();
+        ArrayList<OrdersDTO> result = oDao.searchAllOrdersByUserId(keyword);
+        String url = "";
+        if (result == null) {
+            url = "error.jsp";
+        } else {
+            url = "product.jsp";
+            request.setAttribute("products", result);
+            System.out.println(request.getAttribute("products"));
+        }
+        
+        //Chuyển trang
+        RequestDispatcher rd = request.getRequestDispatcher(url);
+        rd.forward(request, response);
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            System.out.println("ĐÃ DÔ ĐƯỢC ORDER CONTROLLER");
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet OrderController</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet OrderController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        
+        //
+        String action = request.getParameter("action");
+        if(action.equals("addProductToCart")){
+            doAddProduct(request, response);
         }
     }
 

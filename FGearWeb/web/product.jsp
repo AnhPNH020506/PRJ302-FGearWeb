@@ -253,10 +253,10 @@
                     </div>
 
                     <div class="col-4">
-                        <form action="CartController" method="POST" class="h-100">
-                            <input type="hidden" name="action" value="add">
-                            <input type="hidden" name="productId" value="<%= "TEST" %>"> 
-                            <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="border-width: 2px;">
+                        <form action="MainController" method="POST" class="h-100">
+                            <input type="hidden" name="action" value="addProductToCart">
+                            <input type="hidden" name="id" value="<%= product.getProduct_id() %>"> 
+                            <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="border-width: 2px; background-color: #f36f21; color: white">
                                 <i class="fa-solid fa-cart-plus fs-5 mb-1"></i>
                                 <span class="fw-bold text-center" style="font-size: 12px;">THÊM VÀO GIỎ</span>
                             </button>
@@ -265,7 +265,7 @@
                 </div>
                                 
                 <div class="border mb-4">
-                    <div class="text-white p-2 fw-bold fs-6 text-center" style="background-color: #ed1b24;">
+                    <div class="text-black p-2 fw-bold fs-6 text-center" style="background-color: #9CA3AF;">
                         Thông số kỹ thuật
                     </div>
                     <%
