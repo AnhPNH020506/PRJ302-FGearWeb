@@ -306,7 +306,7 @@
                         %>
                         <span class="discount-bdage mb-2">-<%= (int)Math.round(discount) %>% </span>
                     <% } else { %>
-                        <span class="product-price-sale"><%= product.getPrice() %></span>
+                        <span class="product-price-sale"><%= product.getFormattedPrice() %></span>
                     <% } %>
                 </div>
 
@@ -340,7 +340,6 @@
                     </div>
                     <%
                         String specs = product.getSpecifications();
-                        System.out.println(specs);
                         
                         // Tạo một Map để lưu trữ các cặp key-value
                         Map<String, String> specsMap = new HashMap<>();
@@ -436,21 +435,28 @@
         </div>
     </div>
             
-        <!-- Mục reviews -->
+    <!-- Mục reviews -->
     <%    
         ProductReviewDAO prDao = new ProductReviewDAO();
         ArrayList<ProductReviewDTO> product_reviews = prDao.filterByName(product.getProduct_id());
+        
+        //hàm tính trung bình
+        double avg = 0;
+        for (ProductReviewDTO prd_rv : product_reviews) {
+            avg += prd_rv.getRating();
+        }
+        avg = avg / product_reviews.size();
     %>
     <div class="container bg-white p-4 rounded shadow-sm mt-4 mb-4" style="max-width: 1200px;">
         <h2 class="h5 fw-bold mb-4">Đánh giá & Nhận xét <%= product.getName() %></h2>
 
         <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
-            <div class="fw-bold me-3 text-dark" style="font-size: 48px; line-height: 1;">4.94</div>
+            <div class="fw-bold me-3 text-dark" style="font-size: 48px; line-height: 1;"><%= avg %></div>
             <div>
                 <div class="text-warning fs-5 mb-1">
-                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star" ></i><i class="fa-solid fa-star"></i>
                 </div>
-                <div class="text-muted" style="font-size: 14px;">(867 đánh giá) <i class="fa-regular fa-circle-question"></i></div>
+                <div class="text-muted" style="font-size: 14px;">(<%= product_reviews.size() %>)<i class="fa-regular fa-circle-question" style="margin-left: 4px;"></i></div>
             </div>
         </div>
 
@@ -496,8 +502,10 @@
                                     <i class="fa-solid fa-star"></i>
                                 <% } else { %>
                                     <i class="fa-regular fa-star"></i>
-                            <%  } 
-                               } %>
+                            <%  
+                                    } 
+                                } 
+                            %>
                         </div>
                         <span class="fw-bold text-dark" style="font-size: 14px;">
                             <%-- Gợi ý tiêu đề dựa theo sao --%>

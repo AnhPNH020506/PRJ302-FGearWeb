@@ -27,9 +27,9 @@ public class UserDAO {
         UserDTO user = searchByEmail(email);
 
         if (user != null) {
-            String hashedInput = HashPasswordUtils.hashPassword(password);
-
-            if (user.getPassword().equals(hashedInput)) {
+            String hashed = HashPasswordUtils.hashPassword(password);
+            
+            if (user.getPassword().equals(hashed)) {
                 return user;
             }
         }
@@ -79,12 +79,13 @@ public class UserDAO {
         String sql = "UPDATE Users SET password=? WHERE email=?";
 
         try {
-
+            String hashed = HashPasswordUtils.hashPassword(password);
+            
             Connection conn = DbUtils.getConnection();
 
             PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1, password);
+            ps.setString(1, hashed);
             ps.setString(2, email);
 
             return ps.executeUpdate() > 0;
@@ -122,7 +123,7 @@ public class UserDAO {
 
     public boolean register(String email, String name, String password) {
         boolean check = false;
-        String sql = "INSERT INTO Users(email, name, password) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users(email, username, password, updated_at) VALUES (?, ?, ?, ?)";
 
         try {
             Connection conn = DbUtils.getConnection();
@@ -133,6 +134,9 @@ public class UserDAO {
             ps.setString(1, email);
             ps.setString(2, name);
             ps.setString(3, hashed);
+            
+            String x = java.time.LocalDate.now().toString();
+            ps.setString(4, x);
 
             int result = ps.executeUpdate();
 

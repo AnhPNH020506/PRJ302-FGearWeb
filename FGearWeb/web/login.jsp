@@ -309,7 +309,7 @@
                     </div>
                     <!-- HIỂN THỊ LỖI -->
                     <div style="color:red; text-align:center; margin-bottom:10px;">
-                        ${message}
+                        ${error}
                     </div>
                     <div class="login-actions">
                         <button type="submit" class="btn-login">Đăng nhập</button>

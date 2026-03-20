@@ -54,7 +54,7 @@ public class UserController extends HttpServlet {
             UserDTO user = udao.login(email, hashedPassword);
 
             if (user != null) {
-                url = "index.jsp";
+                url =  "index.jsp";
                 session.setAttribute("user", user);
             } else {
                 url = "login.jsp";
