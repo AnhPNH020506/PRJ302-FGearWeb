@@ -243,6 +243,7 @@
 
 
                 <form action="UserController" method="post">
+                    <input type="hidden" name="productId" value="${productId}">
                     <input type="hidden" name="action" value="login">
                     <div class="input-group">
                         <label for="email">Email / Số điện thoại</label>
@@ -255,7 +256,7 @@
                     </div>
                     <!-- HIỂN THỊ LỖI -->
                     <div style="color:red; text-align:center; margin-bottom:10px;">
-                        ${error}
+                        ${not empty error ? error : param.error}
                     </div>
                     <div class="login-actions">
                         <button type="submit" class="btn-login">Đăng nhập</button>

@@ -194,11 +194,22 @@
     %>
     <jsp:include page="header.jsp" />
 
+    <div style="color:${not empty param.error ? 'red' : 'green'}; text-align:center; margin-bottom:10px;">
+        <bold>${not empty param.error ? param.error : param.msg}</bold>
+    </div>
+    <div style="color:red; text-align:center; margin-bottom:10px;">
+        <bold>${error}</bold>
+    </div>
+    
+                    
     <div class="container bg-white p-4 rounded shadow-sm mt-4 mb-4" style="max-width: 1200px;">
         
         <%
-            
-        %>
+            UserDTO curUser = (UserDTO)session.getAttribute("user");
+            if (curUser != null) {
+                System.out.println(curUser.getUserId());
+            }
+       %>
 
         <div class="breadcrumb-custom mb-3">
             <a href="http://localhost:8080/FGearWeb"><i class="fa-solid fa-house"></i> Trang chủ</a> 
@@ -240,29 +251,61 @@
                     <% } %>
                 </div>
 
-                <div class="row g-2 mb-4">
-                    <div class="col-8">
-                        <form action="CartController" method="POST" class="h-100">
-                            <input type="hidden" name="action" value="buy_now">
-                            <input type="hidden" name="productId" value="<%= "TEST" %>"> 
-                            <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="background-color: #f36f21; color: white; border: none;">
-                                <span class="fw-bold fs-5">MUA NGAY</span>
-                                <span class="fw-normal" style="font-size: 11px;">Giao tận nơi/Nhận tại cửa hàng</span>
-                            </button>
-                        </form>
-                    </div>
+                <% if (curUser != null) { %>
+                    <!-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP: Form submit đến Controller xử lý giỏ hàng -->
+                    <div class="row g-2 mb-4">
+                        <div class="col-8">
+                            <form action="MainController" method="POST" class="h-100">
+                                <input type="hidden" name="action" value="addNewOrderMuaNgay">
+                                <input type="hidden" name="productId" value="<%= product.getProduct_id() %>"> 
+                                <input type="hidden" name="userId" value="<%= curUser.getUserId() %>"> 
+                                <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="background-color: #f36f21; color: white; border: none;">
+                                    <span class="fw-bold fs-5">MUA NGAY</span>
+                                    <span class="fw-normal" style="font-size: 11px;">Giao tận nơi/Nhận tại cửa hàng</span>
+                                </button>
+                            </form>
+                        </div>
 
-                    <div class="col-4">
-                        <form action="MainController" method="POST" class="h-100">
-                            <input type="hidden" name="action" value="addProductToCart">
-                            <input type="hidden" name="id" value="<%= product.getProduct_id() %>"> 
-                            <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="border-width: 2px; background-color: #f36f21; color: white">
-                                <i class="fa-solid fa-cart-plus fs-5 mb-1"></i>
-                                <span class="fw-bold text-center" style="font-size: 12px;">THÊM VÀO GIỎ</span>
-                            </button>
-                        </form>
+                        <div class="col-4">
+                            <form action="MainController" method="POST" class="h-100">
+                                <input type="hidden" name="action" value="addProductToOrderGioHang">
+                                <input type="hidden" name="productId" value="<%= product.getProduct_id() %>"> 
+                                <input type="hidden" name="userId" value="<%= curUser.getUserId() %>"> 
+                                <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="border-width: 2px; color: white; background-color: #f36f21">
+                                    <i class="fa-solid fa-cart-plus fs-5 mb-1"></i>
+                                    <span class="fw-bold text-center" style="font-size: 12px;">THÊM VÀO GIỎ</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                <% } else { %>
+                    <!-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP: Form submit để chuyển hướng sang trang Login -->
+                    <div class="row g-2 mb-4">
+                        <div class="col-8">
+                            <!-- Nút Mua ngay khi chưa đăng nhập (Tôi cũng bọc Form đẩy về trang báo lỗi login luôn, bạn tự chỉnh action nếu muốn nhé) -->
+                            <form action="MainController" method="POST" class="h-100">
+                                <input type="hidden" name="action" value="requireLoginUser">
+                                <input type="hidden" name="productid" value="<%= product.getProduct_id() %>">
+                                <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="background-color: #f36f21; color: white; border: none;">
+                                    <span class="fw-bold fs-5">MUA NGAY</span>
+                                    <span class="fw-normal" style="font-size: 11px;">Giao tận nơi/Nhận tại cửa hàng</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="col-4">
+                            <form action="MainController" method="POST" class="h-100">
+                                <!-- Action này gửi về Controller để xử lý redirect sang login kèm thông báo lỗi -->
+                                <input type="hidden" name="action" value="requireLoginUser">
+                                <input type="hidden" name="productid" value="<%= product.getProduct_id() %>">
+                                <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="border-width: 2px; color: white; background-color: #f36f21">
+                                    <i class="fa-solid fa-cart-plus fs-5 mb-1"></i>
+                                    <span class="fw-bold text-center" style="font-size: 12px;">THÊM VÀO GIỎ</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <% } %>
                                 
                 <div class="border mb-4">
                     <div class="text-black p-2 fw-bold fs-6 text-center" style="background-color: #9CA3AF;">

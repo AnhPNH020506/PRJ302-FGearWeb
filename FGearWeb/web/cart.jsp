@@ -4,11 +4,20 @@
     Author     : AD
 --%>
 
+<%@page import="java.text.DecimalFormat"%>
+<%@page import="models.ProductDAO"%>
+<%@page import="models.ProductDTO"%>
 <%@page import="models.OrdersDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="models.OrdersDTO"%>
 <%@page import="models.UserDTO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%!
+    public String formatCurrency(int amount) {
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        return formatter.format(amount) + "vnđ";
+    }
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -65,57 +74,84 @@
         <!-- HEADER CHUẨN ĐÃ ĐƯỢC TÍCH HỢP -->
         <jsp:include page="header.jsp" />
         
+        <%
+          UserDTO user = (UserDTO)session.getAttribute("user");
+        %>
+        
         <!-- NỘI DUNG GIỎ HÀNG CỦA BẠN SẼ CODE Ở ĐÂY -->
             
         <div class="container bg-white p-4 rounded shadow-sm mt-4 mb-4" style="max-width: 800px;">
         <!-- Tiêu đề giỏ hàng -->
+            <%
+                ProductDAO pDao = new ProductDAO();
+                OrdersDAO oDao = new OrdersDAO();
+                ArrayList<OrdersDTO> orders = oDao.searchAllOrdersByUserId(user.getUserId());
+
+                // Bắt đầu vòng lặp ở đây
+                
+            %>
             <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
                 <h4 class="fw-bold m-0" style="color: #333;">Giỏ hàng của tôi</h4>
-                <span class="text-muted">2 sản phẩm</span>
+                <span class="text-muted"><%= orders.size() %> sản phẩm</span>
             </div>
 
             <!-- SẢN PHẨM SỐ 1 -->
             <%
-                OrdersDAO oDao = new OrdersDAO();
-                //OrdersDTO orders = oDao.searchAllOrdersByUserId()
+                for (OrdersDTO ord : orders) {
+                    ProductDTO prd = pDao.findSpecificProductById(ord.getProduct_id());
+                    // Chỉ hiển thị nếu tìm thấy sản phẩm tương ứng trong database
+                    if (prd != null) {
             %>
-            <div class="cart-item border-bottom py-3">
-                <div class="row align-items-center">
-                    <!-- Cột 1: Checkbox & Ảnh -->
-                    <div class="col-4 col-md-2 d-flex align-items-center gap-2">
-                        <input class="form-check-input flex-shrink-0" type="checkbox" value="" checked style="cursor: pointer;">
-                        <img src="https://via.placeholder.com/80" class="img-fluid rounded border p-1" alt="Product 1" style="width: 80px; height: 80px; object-fit: contain;">
-                    </div>
+                        <!-- Bắt đầu phần giao diện của 1 Item trong giỏ hàng -->
+                        <div class="cart-item border-bottom py-3">
+                            <div class="row align-items-center">
+                                <!-- Cột 1: Checkbox & Ảnh -->
+                                <div class="col-4 col-md-2 d-flex align-items-center gap-2">
+                                    <!-- Thay link ảnh fix cứng bằng link ảnh lấy từ database (Giả sử prd có thuộc tính image_url) -->
+                                    <img src="<%= prd.getThumbnail_url() %>" 
+                                         class="img-fluid rounded border p-1" alt="<%= prd.getName() %>" style="width: 80px; height: 80px; object-fit: contain;">
+                                </div>
 
-                    <!-- Cột 2: Thông tin sản phẩm -->
-                    <div class="col-8 col-md-5">
-                        <h6 class="text-truncate mb-1" style="font-size: 15px; color: #333;">Orico USB 3.0 HUBs Bộ chia HUB...</h6>
-                        <p class="text-muted small mb-2">Phân loại: Usb A-100CM</p>
-                        <div class="fw-bold fs-5" style="color: var(--gearvn-red, #ff6600);">306.900đ</div>
-                    </div>
+                                <!-- Cột 2: Thông tin sản phẩm -->
+                                <div class="col-8 col-md-5">
+                                    <!-- Hiển thị tên sản phẩm -->
+                                    <h6 class="text-truncate mb-1" style="font-size: 15px; color: #333;"><%= prd.getName() %></h6>
 
-                    <!-- Cột 3: Số lượng & Nút thao tác -->
-                    <div class="col-12 col-md-5 d-flex align-items-center justify-content-between justify-content-md-end gap-3 mt-3 mt-md-0">
-                        <!-- Bộ chọn số lượng -->
-                        <div class="input-group input-group-sm" style="width: 100px;">
-                            <button class="btn btn-outline-secondary" type="button">-</button>
-                            <input type="text" class="form-control text-center" value="1">
-                            <button class="btn btn-outline-secondary" type="button">+</button>
+                                    <!-- Hiển thị giá sản phẩm -->
+                                    <div class="fw-bold fs-5" style="color: var(--gearvn-red, #ff6600);">
+                                        <%= ord.getFormattedTotalPrice() %>
+                                    </div>
+                                </div>
+
+                                <!-- Cột 3: Số lượng & Nút thao tác -->
+                                <div class="col-12 col-md-5 d-flex align-items-center justify-content-between justify-content-md-end gap-3 mt-3 mt-md-0">
+                                    <!-- Bộ chọn số lượng -->
+                                    <div class="input-group input-group-sm" style="width: 100px;">
+                                        <button class="btn btn-outline-secondary" type="button">-</button>
+                                        <!-- Lấy số lượng thực tế từ đơn hàng (OrdersDTO) -->
+                                        <input type="text" class="form-control text-center" value="<%= ord.getQuantity() %>" readonly>
+                                        <button class="btn btn-outline-secondary" type="button">+</button>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <!-- Nút xóa (Bạn có thể bọc Form hoặc gắn href chứa Order ID để gọi Controller xử lý xóa) -->
+                                        <a href="MainController?action=deleteOrder&orderId=<%= ord.getOrder_id() %>" class="btn btn-sm btn-outline-secondary border-0" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?');">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+
+                                        <!-- Nút Mua hàng riêng lẻ -->
+                                        <button class="btn btn-sm text-white fw-bold px-3" style="background-color: var(--gearvn-red, #ff6600); border-radius: 4px;">
+                                            Thanh toán
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="d-flex gap-2">
-                            <!-- Nút xóa -->
-                            <button class="btn btn-sm btn-outline-secondary border-0" title="Xóa">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                            <!-- Nút Mua hàng riêng lẻ -->
-                            <button class="btn btn-sm text-white fw-bold px-3" style="background-color: var(--gearvn-red, #ff6600); border-radius: 4px;">
-                                Mua hàng
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <!-- Kết thúc phần giao diện của 1 Item -->
+            <%
+                    } // Đóng if (prd != null)
+                } // Đóng vòng lặp for
+            %>
         </div>
         
         <!-- Script -->

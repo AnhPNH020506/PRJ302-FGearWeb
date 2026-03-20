@@ -42,11 +42,16 @@ public class UserController extends HttpServlet {
 
 //        System.out.println(request.getServletPath())
         String action = request.getParameter("action");
-        System.out.println(action);
-
+        System.out.println(action);  
+        
         if (action.equals("login") && session.getAttribute("user") == null) {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
+            
+            // Bắt lấy cái productId từ form đăng nhập gửi lên
+            //này code của khoa, nhớ add thêm dô nha
+            String productId = request.getParameter("productId");
+            System.out.println(productId);
 
             String hashedPassword = HashPasswordUtils.hashPassword(password);
             
@@ -54,10 +59,18 @@ public class UserController extends HttpServlet {
             UserDTO user = udao.login(email, hashedPassword);
 
             if (user != null) {
-                url =  "index.jsp";
-                session.setAttribute("user", user);
+                if (productId != null && !productId.trim().isEmpty() && !productId.equals("test")){
+                    url = "MainController?action=ShowProductDetail&id=" + productId;
+                    session.setAttribute("user", user);
+                } else { //đăng nhập bình thường
+                    url =  "index.jsp";
+                    session.setAttribute("user", user);
+                }
             } else {
                 url = "login.jsp";
+                if(productId != null && !productId.trim().isEmpty() && !productId.equals("test")) {
+                    request.setAttribute("productId", productId);
+                }
                 request.setAttribute("error", "Invalid email or password");
             }
 //            session.setAttribute("user", user) DÒNG NÀY QUAN TRỌNG

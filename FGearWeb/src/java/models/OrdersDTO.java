@@ -4,6 +4,9 @@
  */
 package models;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 /**
  *
  * @author DELL
@@ -147,5 +150,16 @@ public class OrdersDTO {
         this.product_id = product_id;
     }
     
+    public String formatCurrency(double amount) {
+        // Tạo Locale cho Việt Nam để có dấu chấm (.) phân cách hàng nghìn
+        Locale localeVN = new Locale("vi", "VN");
+        NumberFormat currencyFormatter = NumberFormat.getInstance(localeVN);
+
+        // Format số và cộng thêm ký hiệu ₫ vào cuối
+        return currencyFormatter.format(amount) + "₫";
+    }
     
+    public String getFormattedTotalPrice() {
+        return formatCurrency(this.total_price);
+    }
 }
