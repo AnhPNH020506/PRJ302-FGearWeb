@@ -16,6 +16,10 @@
         <servlet-name>ForgotPasswordController</servlet-name>
         <servlet-class>controllers.ForgotPasswordController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>OrderController</servlet-name>
+        <servlet-class>controllers.OrderController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ProductController</servlet-name>
         <url-pattern>/ProductController</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>ForgotPasswordController</servlet-name>
         <url-pattern>/ForgotPasswordController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrderController</servlet-name>
+        <url-pattern>/OrderController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

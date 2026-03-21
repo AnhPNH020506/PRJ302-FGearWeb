@@ -33,13 +33,27 @@ public class MainController extends HttpServlet {
 
         String action = request.getParameter("action");
         String url = "index.jsp";
+        
+            
 
         if (action.contains("Product")) {
 //            String keyword = request.getParameter("keyword");
 //            System.out.println(keyword);
-
             url = "ProductController";
         }
+        if (action.contains("Order")){
+            url = "OrderController";
+        }
+        if(action.equals("requireLoginUser")){
+            // 1. Lấy productId từ form gửi lên
+            String productId = request.getParameter("productid"); 
+            // 2. Set thông báo lỗi
+            request.setAttribute("error", "You must login first");
+            // 3. Set lại cái productId này vào request để quăng sang trang login
+            request.setAttribute("productId", productId);
+            url = "login.jsp";
+        }
+        
         if (action.equals("sendCode")
                 || action.equals("verifyCode")
                 || action.equals("resetPassword")) {
@@ -47,8 +61,10 @@ public class MainController extends HttpServlet {
             url = "ForgotPasswordController";
         }
 
-        RequestDispatcher rd = request.getRequestDispatcher(url);
-        rd.forward(request, response);
+        if (!response.isCommitted()) {
+            RequestDispatcher rd = request.getRequestDispatcher(url);
+            rd.forward(request, response);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
