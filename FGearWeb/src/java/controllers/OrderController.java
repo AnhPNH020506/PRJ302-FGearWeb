@@ -175,6 +175,35 @@ public class OrderController extends HttpServlet {
         RequestDispatcher rd = request.getRequestDispatcher(url);
         rd.forward(request, response);
     }
+
+    protected void updateOrderStatus(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+    
+        String order_id = request.getParameter("orderId");
+        String paymentMethod = request.getParameter("paymentMethod");
+        String shipping_address = request.getParameter("shippingAddress");
+        String receipt = request.getParameter("receipt"); // lấy từ form
+    
+        OrdersDAO oDao = new OrdersDAO();
+        boolean ok = false;
+    
+        if ("COD".equals(paymentMethod)) {
+            ok = oDao.updateCODStatus(order_id, shipping_address);
+        } else if ("BANK".equals(paymentMethod)) {
+            ok = oDao.updateBANKStatus(order_id, shipping_address, receipt);
+        }
+    
+        if (ok) {
+            System.out.println("UPDATE ORDER SUCCESS");
+        } else {
+            System.out.println("UPDATE ORDER FAIL");
+        }
+    
+        // redirect về trang admin orders
+        response.sendRedirect("MainController?action=admin&view=orders");
+    }
   
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
