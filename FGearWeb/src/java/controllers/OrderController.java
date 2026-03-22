@@ -134,29 +134,34 @@ public class OrderController extends HttpServlet {
     }
     
     protected void updateOrderStatus(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String order_id = (String)request.getParameter("orderId");
-        String paymentMethod = (String)request.getParameter("paymentMethod");
-        String shipping_address = (String)request.getParameter("shippingAddress");
-        String receipt = (String)request.getAttribute("receipt"); 
-        String url = "";
-        
-        OrdersDAO oDao = new OrdersDAO();
-        if (paymentMethod.equals("COD")){
-            if(oDao.updateCODStatus(order_id, shipping_address)){
-                System.out.println("Update COD thành công");
-                url = "cart.jsp";
-            }
-        } else if (paymentMethod.equals("BANK")){
-            if(oDao.updateBANKStatus(order_id, shipping_address, receipt)) {
-                System.out.println("Update BANK thành công");
-                url = "cart.jsp";
-            }
-        }
-        
-        RequestDispatcher rd = request.getRequestDispatcher(url);
-        rd.forward(request, response);
+        throws ServletException, IOException {
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+
+    String order_id = request.getParameter("orderId");
+    String paymentMethod = request.getParameter("paymentMethod");
+    String shipping_address = request.getParameter("shippingAddress");
+    String receipt = request.getParameter("receipt"); // lấy từ form
+
+    OrdersDAO oDao = new OrdersDAO();
+    boolean ok = false;
+
+    if ("COD".equals(paymentMethod)) {
+        ok = oDao.updateCODStatus(order_id, shipping_address);
+    } else if ("BANK".equals(paymentMethod)) {
+        ok = oDao.updateBANKStatus(order_id, shipping_address, receipt);
     }
+
+    if (ok) {
+        System.out.println("UPDATE ORDER SUCCESS");
+    } else {
+        System.out.println("UPDATE ORDER FAIL");
+    }
+
+    // redirect về trang admin orders
+    response.sendRedirect("MainController?action=admin&view=orders");
+}
+
     protected void doBuyNow(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String product_id = (String)request.getParameter("productId");

@@ -32,7 +32,7 @@ public class ProductController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void doShowAllProductsByCategory (HttpServletRequest request, HttpServletResponse response)
+    protected void doShowAllProductsByCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
@@ -49,13 +49,13 @@ public class ProductController extends HttpServlet {
             request.setAttribute("products", result);
             System.out.println(request.getAttribute("products"));
         }
-        
+
         //Chuyển trang
         RequestDispatcher rd = request.getRequestDispatcher(url);
         rd.forward(request, response);
     }
-    
-    protected void doShowProductDetail (HttpServletRequest request, HttpServletResponse response)
+
+    protected void doShowProductDetail(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
@@ -72,24 +72,90 @@ public class ProductController extends HttpServlet {
             request.setAttribute("product", result);
 //            System.out.println(request.getAttribute("products"));
         }
-        
+
         //Chuyển trang
         RequestDispatcher rd = request.getRequestDispatcher(url);
         rd.forward(request, response);
     }
-    
+
+    protected void doUpdateProduct(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // đảm bảo encoding
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        String id = request.getParameter("product_id");
+        String name = request.getParameter("name");
+
+        // parse số an toàn
+        int price = 0;
+        String priceStr = request.getParameter("price");
+        if (priceStr != null && !priceStr.trim().isEmpty()) {
+            try {
+                price = Integer.parseInt(priceStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid price input: " + priceStr);
+            }
+        }
+
+        int sale_price = 0;
+        String saleStr = request.getParameter("sale_price");
+        if (saleStr != null && !saleStr.trim().isEmpty()) {
+            try {
+                sale_price = Integer.parseInt(saleStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid sale_price input: " + saleStr);
+            }
+        }
+
+        String thumbnail = request.getParameter("thumbnail_url");
+        String brand = request.getParameter("brand");
+        String status = request.getParameter("status");
+        String spec = request.getParameter("specifications");
+
+        // tạo DTO
+        ProductDTO p = new ProductDTO();
+        p.setProduct_id(id);
+        p.setName(name);
+        p.setPrice(price);
+        p.setSale_price(sale_price);
+        p.setThumbnail_url(thumbnail);
+        p.setBrand(brand);
+        p.setStatus(status);
+        p.setSpecifications(spec);
+
+        ProductDAO dao = new ProductDAO();
+
+        if (dao.updateProduct(p)) {
+            System.out.println("UPDATE PRODUCT SUCCESS");
+        } else {
+            System.out.println("UPDATE PRODUCT FAIL");
+        }
+
+        // redirect về admin
+        response.sendRedirect("MainController?action=admin&view=products");
+        return;
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        
+
         //
         String action = request.getParameter("action");
-        if(action.equals("ShowProduct")){
+        if (action.equals("ShowProduct")) {
             doShowAllProductsByCategory(request, response);
-        } else if(action.equals("ShowProductDetail")){
+        } else if (action.equals("ShowProductDetail")) {
             doShowProductDetail(request, response);
+        } else if (action.equals("deleteProduct")) {
+            new ProductDAO().deleteProduct(request.getParameter("id"));
+            response.sendRedirect("MainController?action=admin&view=products");
+            return;
+        } else if (action.equals("updateProduct")) {
+            doUpdateProduct(request, response);
         }
     }
 
@@ -120,13 +186,13 @@ public class ProductController extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    
+
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    
+
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -142,8 +208,8 @@ public class ProductController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-    
-                //SUPPORTING METHODS
+
+    //SUPPORTING METHODS
 //    private void searchProductsBySubCategory(HttpServletRequest request, HttpServletResponse response) {
 //        response.setContentType("text/plain;charset=UTF-8"); //hiện Tiếng Việt
 //        
@@ -170,7 +236,6 @@ public class ProductController extends HttpServlet {
 //            e.printStackTrace();
 //        }
 //    }
-    
 //    private void findSpecificProductByItsId(HttpServletRequest request, HttpServletResponse response) {
 //        response.setContentType("text/plain;charset=UTF-8"); //hiện Tiếng Việt
 //        
