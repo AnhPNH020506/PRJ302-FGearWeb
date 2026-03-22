@@ -7,14 +7,25 @@ package controllers;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.nio.file.Paths;
+import java.io.File;
+import javax.servlet.annotation.WebServlet;
 
 /**
  *
  * @author DELL
  */
+@WebServlet(name = "MainController", urlPatterns = {"/MainController"})
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+    maxFileSize = 1024 * 1024 * 30,      // Giới hạn file 10MB
+    maxRequestSize = 1024 * 1024 * 50    // Giới hạn tổng request 50MB
+)
 public class MainController extends HttpServlet {
 
     /**
@@ -26,39 +37,35 @@ public class MainController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
+        System.out.println("action ở MainController: " + action);
+//        System.out.println("action2 ở MainController: " + action2);
         String url = "index.jsp";
-        
-            
 
-        if (action.contains("Product")) {
-//            String keyword = request.getParameter("keyword");
-//            System.out.println(keyword);
-            url = "ProductController";
-        }
-        if (action.contains("Order")){
-            url = "OrderController";
-        }
-        if(action.equals("requireLoginUser")){
-            // 1. Lấy productId từ form gửi lên
-            String productId = request.getParameter("productid"); 
-            // 2. Set thông báo lỗi
-            request.setAttribute("error", "You must login first");
-            // 3. Set lại cái productId này vào request để quăng sang trang login
-            request.setAttribute("productId", productId);
-            url = "login.jsp";
-        }
-        
-        if (action.equals("sendCode")
-                || action.equals("verifyCode")
-                || action.equals("resetPassword")) {
-
-            url = "ForgotPasswordController";
+        // CÁCH FIX: Check null trước khi làm bất cứ việc gì với biến action
+        if (action == null) {
+            // Nếu action null, cho nó về trang chủ hoặc báo lỗi nhẹ nhàng
+            url = "index.jsp"; 
+        } else {
+            // Dùng so sánh ngược: "chuỗi".equals(biến) để không bao giờ bị NullPointer
+            if (action.contains("Product")) {
+                url = "ProductController";
+            } else if (action.contains("Order")) {
+                url = "OrderController";
+            } else if ("requireLoginUser".equals(action)) {
+                String productId = request.getParameter("productid"); 
+                request.setAttribute("error", "You must login first");
+                request.setAttribute("productId", productId);
+                url = "login.jsp";
+            } else if ("sendCode".equals(action) || "verifyCode".equals(action) || "resetPassword".equals(action)) {
+                url = "ForgotPasswordController";
+            }
         }
 
         if (!response.isCommitted()) {
@@ -93,6 +100,52 @@ public class MainController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String paymentMethod = request.getParameter("paymentMethod");
+        String paymentImgPath = null; // Biến để lưu đường dẫn ảnh nhét vào DB
+
+        // NẾU KHÁCH CHỌN CHUYỂN KHOẢN THÌ MỚI ĐI TÌM ẢNH ĐỂ LƯU
+        if ("BANK".equals(paymentMethod)) {
+            // Lấy thẻ input có name="receiptImage"
+            Part filePart = request.getPart("receiptImage"); 
+
+            // Kiểm tra xem khách có chọn file thật không
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+
+                // 1. ĐƯỜNG DẪN ẢO CỦA SERVER (Để web hiện ảnh liền)
+                String serverPath = getServletContext().getRealPath("/") + "assets" + File.separator + "img" + File.separator + "payment_image";
+                File serverDir = new File(serverPath);
+                if (!serverDir.exists()) serverDir.mkdirs();
+
+                // 2. ĐƯỜNG DẪN GỐC TRÊN MÁY BẠN (Lấy theo hình bạn gửi để không bị mất ảnh khi Clean & Build)
+                String sourcePath = "C:\\Users\\AD\\Documents\\GitHub\\PRJ302-FGearWeb\\FGearWeb\\web\\assets\\img\\payment_image";
+                File sourceDir = new File(sourcePath);
+                if (!sourceDir.exists()) sourceDir.mkdirs();
+
+                // TIẾN HÀNH LƯU ẢNH VÀO SERVER TRƯỚC
+                String fullServerFilePath = serverPath + File.separator + uniqueFileName;
+                filePart.write(fullServerFilePath);
+
+                // COPY ẢNH VỀ SOURCE GỐC ĐỂ BACKUP
+                String fullSourceFilePath = sourcePath + File.separator + uniqueFileName;
+                try {
+                    java.nio.file.Files.copy(
+                        Paths.get(fullServerFilePath), 
+                        Paths.get(fullSourceFilePath), 
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                    );
+                    System.out.println("Đã backup ảnh an toàn vào Source code!");
+                } catch (Exception e) {
+                    System.out.println("Lỗi khi backup ảnh: " + e.getMessage());
+                }
+
+                // Chuẩn bị đường dẫn để lưu xuống Database (luôn là đường dẫn tương đối này)
+                paymentImgPath = "assets/img/payment_image/" + uniqueFileName;
+                request.setAttribute("receipt", paymentImgPath);
+                System.out.println("Đường dẫn lưu Database: " + paymentImgPath);
+            }
+        }
         processRequest(request, response);
     }
 
