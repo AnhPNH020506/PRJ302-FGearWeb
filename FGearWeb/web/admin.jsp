@@ -41,6 +41,10 @@
 <div class="content">
 
 <!-- ================= USERS ================= -->
+<c:if test="${empty users}">
+    <c:redirect url="login.jsp"/>
+</c:if>
+
 <c:if test="${not empty users}">
     <h2>User List</h2>
     <table>
