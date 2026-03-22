@@ -31,6 +31,38 @@ public class UserController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    protected void doUpdateUser(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+    String id = request.getParameter("user_id");
+    String username = request.getParameter("username");
+    String email = request.getParameter("email");   
+    String contact = request.getParameter("contact");
+    String address = request.getParameter("address");
+    int role = Integer.parseInt(request.getParameter("role"));
+    String status = request.getParameter("status");
+
+    UserDTO u = new UserDTO();
+    u.setUserId(id);
+    u.setUsername(username);
+    u.setEmail(email);              
+    u.setContact(contact);
+    u.setAddress(address);
+    u.setRole(role);
+    u.setStatus(status);
+
+    UserDAO dao = new UserDAO();
+
+    if (dao.updateUser(u)) {
+        System.out.println("UPDATE USER SUCCESS");
+    } else {
+        System.out.println("UPDATE USER FAIL");
+    }
+
+    response.sendRedirect("MainController?action=admin&view=users");
+    return; // thêm return để không bị forward thêm lần nữa
+}
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -42,38 +74,51 @@ public class UserController extends HttpServlet {
 
 //        System.out.println(request.getServletPath())
         String action = request.getParameter("action");
-        System.out.println(action);  
-        
+        System.out.println(action);
+
         if (action.equals("login") && session.getAttribute("user") == null) {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
-            
+
             // Bắt lấy cái productId từ form đăng nhập gửi lên
             //này code của khoa, nhớ add thêm dô nha
             String productId = request.getParameter("productId");
             System.out.println(productId);
 
             String hashedPassword = HashPasswordUtils.hashPassword(password);
-            
+
             UserDAO udao = new UserDAO();
             UserDTO user = udao.login(email, hashedPassword);
 
             if (user != null) {
-                if (productId != null && !productId.trim().isEmpty() && !productId.equals("test")){
-                    url = "MainController?action=ShowProductDetail&id=" + productId;
-                    session.setAttribute("user", user);
-                } else { //đăng nhập bình thường
-                    url =  "index.jsp";
-                    session.setAttribute("user", user);
+
+                session.setAttribute("user", user);
+
+                // 👉 Nếu login từ product detail
+                if (productId != null && !productId.trim().isEmpty() && !productId.equals("test")) {
+                    response.sendRedirect("MainController?action=ShowProductDetail&id=" + productId);
+                    return;
                 }
+
+                // 👉 ADMIN (role = 0)
+                if (user.getRole() == 0) {
+                    response.sendRedirect("MainController?action=admin&view=users");
+                    return;
+                } // 👉 USER thường
+                else {
+                    response.sendRedirect("index.jsp");
+                    return;
+                }
+
             } else {
                 url = "login.jsp";
-                if(productId != null && !productId.trim().isEmpty() && !productId.equals("test")) {
+
+                if (productId != null && !productId.trim().isEmpty() && !productId.equals("test")) {
                     request.setAttribute("productId", productId);
                 }
+
                 request.setAttribute("error", "Invalid email or password");
-            }
-//            session.setAttribute("user", user) DÒNG NÀY QUAN TRỌNG
+            }//            session.setAttribute("user", user) DÒNG NÀY QUAN TRỌNG
         }/*REGISTER*/ else if (action.equals("register")) {
             String email = request.getParameter("email");
             String name = request.getParameter("nameRegister");
@@ -124,6 +169,22 @@ public class UserController extends HttpServlet {
             session.invalidate();
             //url = "index.jsp";
             response.sendRedirect("index.jsp");
+            return;
+        } else if (action.equals("deleteUser")) {
+            String id = request.getParameter("id");
+            new UserDAO().deleteUser(id);
+            response.sendRedirect("MainController?action=admin&view=users");
+            return;
+        } else if (action.equals("addUserAdmin")) {
+            new UserDAO().addUser(
+                    request.getParameter("name"),
+                    request.getParameter("email"),
+                    request.getParameter("password")
+            );
+            response.sendRedirect("MainController?action=admin&view=users");
+            return;
+        } else if (action.equals("updateUser")) {
+            doUpdateUser(request, response);
             return;
         }
 

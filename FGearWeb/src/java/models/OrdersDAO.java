@@ -18,10 +18,9 @@ public class OrdersDAO {
 
     public OrdersDAO() {
     }
-    
+
     //METHODS
-    
-        //delete
+    //delete
     public boolean deleteOrder(String order_id) {
         int result = 0;
         try {
@@ -39,8 +38,8 @@ public class OrdersDAO {
         }
         return result > 0;
     }
-    
-        //update
+
+    //update
     public boolean updateBANKStatus(String order_id, String shipping_address, String receipt) {
         int result = 0;
         try {
@@ -60,6 +59,7 @@ public class OrdersDAO {
         }
         return result > 0;
     }
+
     public boolean updateCODStatus(String order_id, String shipping_address) {
         int result = 0;
         try {
@@ -78,6 +78,7 @@ public class OrdersDAO {
         }
         return result > 0;
     }
+
     public boolean decreaseQuantity(String order_id) {
         int result = 0;
         try {
@@ -113,16 +114,16 @@ public class OrdersDAO {
         }
         return result > 0;
     }
-    
-    public OrdersDTO findSpecificOrderById(String order_id_param){
+
+    public OrdersDTO findSpecificOrderById(String order_id_param) {
         OrdersDTO res = null;
         try {
             Connection conn = DbUtils.getConnection();
             String sql = "SELECT * FROM orders WHERE order_id=?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, order_id_param);
-            ResultSet rs =  pst.executeQuery();
-            while(rs.next()){
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
                 // Truy xuất dữ liệu từ ResultSet dựa theo các field của OrdersDTO
                 String order_id = rs.getString("order_id");
                 String shipping_address = rs.getString("shipping_address");
@@ -139,26 +140,31 @@ public class OrdersDAO {
                 String product_id = rs.getString("product_id");
 
                 // Tạo đối tượng OrdersDTO (Giả sử bạn đã có constructor đầy đủ tham số theo thứ tự này)
-                res = new OrdersDTO(order_id, shipping_address, total_price, 
-                                    shipping_fee, payment_method, payment_status, 
-                                    order_status, created_at, db_user_id, 
-                                    shipper_id, promotion_id, quantity, product_id);
+                res = new OrdersDTO(order_id, shipping_address, total_price,
+                        shipping_fee, payment_method, payment_status,
+                        order_status, created_at, db_user_id,
+                        shipper_id, promotion_id, quantity, product_id);
             }
-            if (pst != null) pst.close();
-            if (rs != null) rs.close();
+            if (pst != null) {
+                pst.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
         //kết quả
-        if (res == null){
+        if (res == null) {
             return null;
         } else {
             return res;
         }
     }
-        //add
-    public boolean addCODOrder(String product_id, String user_id, String shipping_address){
+    //add
+
+    public boolean addCODOrder(String product_id, String user_id, String shipping_address) {
         int result = 0;
         try {
             Connection conn = DbUtils.getConnection();
@@ -179,7 +185,8 @@ public class OrdersDAO {
         }
         return result > 0;
     }
-    public boolean addBANKOrder(String product_id, String user_id, String shipping_address, String receipt){
+
+    public boolean addBANKOrder(String product_id, String user_id, String shipping_address, String receipt) {
         int result = 0;
         try {
             Connection conn = DbUtils.getConnection();
@@ -201,7 +208,7 @@ public class OrdersDAO {
         }
         return result > 0;
     }
-    
+
 //    public boolean addBuyNowOrder(String product_id, String user_id, String payment_method, String shipping_address) {
 //        int result = 0;
 //        try {
@@ -224,7 +231,6 @@ public class OrdersDAO {
 //        }
 //        return result > 0;
 //    }
-    
     public boolean addOrder(String user_id, String product_id) {
         int result = 0;
         try {
@@ -243,62 +249,53 @@ public class OrdersDAO {
         }
         return result > 0;
     }
-    public OrdersDTO findOrderByProductId(String product_id_param, String user_id_param) { 
-        OrdersDTO res = null;
-        try {
-            Connection conn = DbUtils.getConnection();
-            String sql = "SELECT * FROM orders WHERE product_id=? and user_id= ?";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, product_id_param);
-            pst.setString(1, user_id_param);
-            ResultSet rs =  pst.executeQuery();
-            while(rs.next()){
-                // Truy xuất dữ liệu từ ResultSet dựa theo các field của OrdersDTO
-                String order_id = rs.getString("order_id");
-                String shipping_address = rs.getString("shipping_address");
-                double total_price = rs.getDouble("total_price");
-                double shipping_fee = rs.getDouble("shipping_fee");
-                String payment_method = rs.getString("payment_method");
-                String payment_status = rs.getString("payment_status");
-                String order_status = rs.getString("order_status");
-                String created_at = rs.getString("created_at");
-                String db_user_id = rs.getString("user_id");
-                String shipper_id = rs.getString("shipper_id");
-                String promotion_id = rs.getString("promotion_id");
-                int quantity = rs.getInt("quantity");
-                String product_id = rs.getString("product_id");
 
-                // Tạo đối tượng OrdersDTO (Giả sử bạn đã có constructor đầy đủ tham số theo thứ tự này)
-                res = new OrdersDTO(order_id, shipping_address, total_price, 
-                                    shipping_fee, payment_method, payment_status, 
-                                    order_status, created_at, db_user_id, 
-                                    shipper_id, promotion_id, quantity, product_id);
+    public OrdersDTO findOrderByProductId(String product_id_param, String user_id_param) {
+    OrdersDTO res = null;
+    try (Connection conn = DbUtils.getConnection();
+         PreparedStatement pst = conn.prepareStatement(
+             "SELECT * FROM orders WHERE product_id=? AND user_id=?")) {
+
+        pst.setString(1, product_id_param);
+        pst.setString(2, user_id_param);
+
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                res = new OrdersDTO(
+                    rs.getString("order_id"),
+                    rs.getString("shipping_address"),
+                    rs.getDouble("total_price"),
+                    rs.getDouble("shipping_fee"),
+                    rs.getString("payment_method"),
+                    rs.getString("payment_status"),
+                    rs.getString("order_status"),
+                    rs.getString("created_at"),
+                    rs.getString("user_id"),
+                    rs.getString("shipper_id"),
+                    rs.getString("promotion_id"),
+                    rs.getInt("quantity"),
+                    rs.getString("product_id")
+                );
             }
-            if (pst != null) pst.close();
-            if (rs != null) rs.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
-        //kết quả
-        if (res == null){
-            return null;
-        } else {
-            return res;
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-    
-    public ArrayList<OrdersDTO> searchAllOrdersByUserId(String user_id) { 
+    return res;
+}
+
+
+    public ArrayList<OrdersDTO> searchAllOrdersByUserId(String user_id) {
         ArrayList<OrdersDTO> res = new ArrayList<>();
-        
+
         try {
             Connection conn = DbUtils.getConnection();
             String sql = "SELECT * FROM orders WHERE user_id=?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, user_id);
-            ResultSet rs =  pst.executeQuery();
-            
-            while(rs.next()){
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
                 // Truy xuất dữ liệu từ ResultSet dựa theo các field của OrdersDTO
                 String order_id = rs.getString("order_id");
                 String shipping_address = rs.getString("shipping_address");
@@ -315,38 +312,42 @@ public class OrdersDAO {
                 String product_id = rs.getString("product_id");
 
                 // Tạo đối tượng OrdersDTO (Giả sử bạn đã có constructor đầy đủ tham số theo thứ tự này)
-                OrdersDTO order = new OrdersDTO(order_id, shipping_address, total_price, 
-                                                shipping_fee, payment_method, payment_status, 
-                                                order_status, created_at, db_user_id, 
-                                                shipper_id, promotion_id, quantity, product_id);
+                OrdersDTO order = new OrdersDTO(order_id, shipping_address, total_price,
+                        shipping_fee, payment_method, payment_status,
+                        order_status, created_at, db_user_id,
+                        shipper_id, promotion_id, quantity, product_id);
 
                 // Thêm vào list kết quả
                 res.add(order);
             }
-            if (pst != null) pst.close();
-            if (rs != null) rs.close();
+            if (pst != null) {
+                pst.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        if (res.isEmpty()){
+        if (res.isEmpty()) {
             return null;
         } else {
             return res;
         }
     }
-    
-    public ArrayList<OrdersDTO> addToCart(String user_id) { 
+
+    public ArrayList<OrdersDTO> addToCart(String user_id) {
         ArrayList<OrdersDTO> res = new ArrayList<>();
-        
+
         try {
             Connection conn = DbUtils.getConnection();
             String sql = "SELECT * FROM orders WHERE user_id=?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, user_id);
-            ResultSet rs =  pst.executeQuery();
-            
-            while(rs.next()){
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
                 // Truy xuất dữ liệu từ ResultSet dựa theo các field của OrdersDTO
                 String order_id = rs.getString("order_id");
                 String shipping_address = rs.getString("shipping_address");
@@ -363,24 +364,53 @@ public class OrdersDAO {
                 String product_id = rs.getString("product_id");
 
                 // Tạo đối tượng OrdersDTO (Giả sử bạn đã có constructor đầy đủ tham số theo thứ tự này)
-                OrdersDTO order = new OrdersDTO(order_id, shipping_address, total_price, 
-                                                shipping_fee, payment_method, payment_status, 
-                                                order_status, created_at, db_user_id, 
-                                                shipper_id, promotion_id, quantity, product_id);
+                OrdersDTO order = new OrdersDTO(order_id, shipping_address, total_price,
+                        shipping_fee, payment_method, payment_status,
+                        order_status, created_at, db_user_id,
+                        shipper_id, promotion_id, quantity, product_id);
 
                 // Thêm vào list kết quả
                 res.add(order);
             }
-            if (pst != null) pst.close();
-            if (rs != null) rs.close();
+            if (pst != null) {
+                pst.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        if (res.isEmpty()){
+        if (res.isEmpty()) {
             return null;
         } else {
             return res;
         }
     }
+
+    public boolean updateOrder(String orderId, String paymentMethod, String shippingAddress, String receipt) {
+        try ( Connection conn = DbUtils.getConnection()) {
+            if ("COD".equals(paymentMethod)) {
+                String sql = "UPDATE orders SET payment_method='COD', order_status='CONFIRMED', shipping_address=? WHERE order_id=?";
+                try ( PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, shippingAddress);
+                    ps.setString(2, orderId);
+                    return ps.executeUpdate() > 0;
+                }
+            } else if ("BANK".equals(paymentMethod)) {
+                String sql = "UPDATE orders SET payment_method='BANK', payment_status='DONE', order_status='CONFIRMED', shipping_address=?, receipt=? WHERE order_id=?";
+                try ( PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, shippingAddress);
+                    ps.setString(2, receipt);
+                    ps.setString(3, orderId);
+                    return ps.executeUpdate() > 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

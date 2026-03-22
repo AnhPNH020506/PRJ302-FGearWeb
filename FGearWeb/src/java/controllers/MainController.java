@@ -15,6 +15,11 @@ import javax.servlet.http.Part;
 import java.nio.file.Paths;
 import java.io.File;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpSession;
+import models.OrdersDAO;
+import models.ProductDAO;
+import models.UserDTO;
+import models.UserDAO;
 
 /**
  *
@@ -22,9 +27,9 @@ import javax.servlet.annotation.WebServlet;
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-    maxFileSize = 1024 * 1024 * 30,      // Giới hạn file 10MB
-    maxRequestSize = 1024 * 1024 * 50    // Giới hạn tổng request 50MB
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 30, // Giới hạn file 10MB
+        maxRequestSize = 1024 * 1024 * 50 // Giới hạn tổng request 50MB
 )
 public class MainController extends HttpServlet {
 
@@ -37,7 +42,6 @@ public class MainController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -52,15 +56,28 @@ public class MainController extends HttpServlet {
         // CÁCH FIX: Check null trước khi làm bất cứ việc gì với biến action
         if (action == null) {
             // Nếu action null, cho nó về trang chủ hoặc báo lỗi nhẹ nhàng
-            url = "index.jsp"; 
+            url = "index.jsp";
         } else {
             // Dùng so sánh ngược: "chuỗi".equals(biến) để không bao giờ bị NullPointer
             if (action.contains("Product") && !action.contains("Order")) {
                 url = "ProductController";
             } else if (action.contains("Order")) {
                 url = "OrderController";
+            } else if ("admin".equals(action)) {
+                HttpSession session = request.getSession();
+                UserDTO user = (UserDTO) session.getAttribute("user");
+
+                if (user == null || user.getRole() != 0) { // nhớ check lại role DB
+                    System.out.println("KHÔNG PHẢI ADMIN → redirect login");
+                    url = "login.jsp";
+                } else {
+                    System.out.println("ADMIN ĐĂNG NHẬP → vào AdminController");
+                    url = "AdminController";
+                }
+
+                // ===================================================
             } else if ("requireLoginUser".equals(action)) {
-                String productId = request.getParameter("productid"); 
+                String productId = request.getParameter("productid");
                 request.setAttribute("error", "You must login first");
                 request.setAttribute("productId", productId);
                 url = "login.jsp";
@@ -68,7 +85,29 @@ public class MainController extends HttpServlet {
                 url = "ForgotPasswordController";
             } else if (action.contains("Review")){
                 url = "ProductReviewController";
+            } else if (action.equals("updateUser")) {
+                url = "UserController";
+            } else if (action.equals("updateProduct")) {
+                url = "ProductController";
+            } else if (action.equals("updateOrderStatus")) {
+                url = "OrderController";
+            } else if ("deleteUser".equals(action)) {
+                String id = request.getParameter("id");
+                new UserDAO().deleteUser(id);
+                response.sendRedirect("MainController?action=admin&view=users");
+                return;
+            } else if ("deleteProduct".equals(action)) {
+                String id = request.getParameter("id");
+                new ProductDAO().deleteProduct(id);
+                response.sendRedirect("MainController?action=admin&view=products");
+                return;
+            } else if ("deleteOrder".equals(action)) {
+                String orderId = request.getParameter("orderId");
+                new OrdersDAO().deleteOrder(orderId);
+                response.sendRedirect("MainController?action=admin&view=orders");
+                return;
             }
+
         }
 
         if (!response.isCommitted()) {
@@ -77,7 +116,7 @@ public class MainController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -109,7 +148,7 @@ public class MainController extends HttpServlet {
         // NẾU KHÁCH CHỌN CHUYỂN KHOẢN THÌ MỚI ĐI TÌM ẢNH ĐỂ LƯU
         if ("BANK".equals(paymentMethod)) {
             // Lấy thẻ input có name="receiptImage"
-            Part filePart = request.getPart("receiptImage"); 
+            Part filePart = request.getPart("receiptImage");
 
             // Kiểm tra xem khách có chọn file thật không
             if (filePart != null && filePart.getSize() > 0) {
@@ -119,12 +158,16 @@ public class MainController extends HttpServlet {
                 // 1. ĐƯỜNG DẪN ẢO CỦA SERVER (Để web hiện ảnh liền)
                 String serverPath = getServletContext().getRealPath("/") + "assets" + File.separator + "img" + File.separator + "payment_image";
                 File serverDir = new File(serverPath);
-                if (!serverDir.exists()) serverDir.mkdirs();
+                if (!serverDir.exists()) {
+                    serverDir.mkdirs();
+                }
 
                 // 2. ĐƯỜNG DẪN GỐC TRÊN MÁY BẠN (Lấy theo hình bạn gửi để không bị mất ảnh khi Clean & Build)
                 String sourcePath = "C:\\Users\\AD\\Documents\\GitHub\\PRJ302-FGearWeb\\FGearWeb\\web\\assets\\img\\payment_image";
                 File sourceDir = new File(sourcePath);
-                if (!sourceDir.exists()) sourceDir.mkdirs();
+                if (!sourceDir.exists()) {
+                    sourceDir.mkdirs();
+                }
 
                 // TIẾN HÀNH LƯU ẢNH VÀO SERVER TRƯỚC
                 String fullServerFilePath = serverPath + File.separator + uniqueFileName;
@@ -134,9 +177,9 @@ public class MainController extends HttpServlet {
                 String fullSourceFilePath = sourcePath + File.separator + uniqueFileName;
                 try {
                     java.nio.file.Files.copy(
-                        Paths.get(fullServerFilePath), 
-                        Paths.get(fullSourceFilePath), 
-                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                            Paths.get(fullServerFilePath),
+                            Paths.get(fullSourceFilePath),
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
                     );
                     System.out.println("Đã backup ảnh an toàn vào Source code!");
                 } catch (Exception e) {
