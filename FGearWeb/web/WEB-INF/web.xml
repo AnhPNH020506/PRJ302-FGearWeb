@@ -21,6 +21,10 @@
         <servlet-class>controllers.OrderController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ProductReviewController</servlet-name>
+        <servlet-class>controllers.ProductReviewController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>AdminController</servlet-name>
         <servlet-class>controllers.AdminController</servlet-class>
     </servlet>
@@ -43,6 +47,10 @@
     <servlet-mapping>
         <servlet-name>OrderController</servlet-name>
         <url-pattern>/OrderController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductReviewController</servlet-name>
+        <url-pattern>/ProductReviewController</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminController</servlet-name>

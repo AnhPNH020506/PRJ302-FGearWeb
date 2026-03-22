@@ -60,4 +60,33 @@ public class ProductReviewDAO {
     public ArrayList<ProductReviewDTO> filterByName(String id) {
         return searchReviewAll("product_id", id);
     }
+    
+        //add
+    public boolean addProductReview(String content, int rating, String product_id, String user_id, String image_url) {
+        int result = 0;
+        try {
+            Connection conn = DbUtils.getConnection();
+            
+            // Cập nhật lệnh SQL: Insert vào bảng đánh giá (giả định là product_reviews)
+            // Truyền 4 tham số dạng ? và dùng hàm GETDATE() trực tiếp cho cột created_at
+            String sql = "INSERT INTO ProductReviews (content, rating, product_id, user_id, created_at, image_url) VALUES (?, ?, ?, ?, GETDATE(), ?)";
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            // Gán 4 giá trị vào dấu ? theo đúng thứ tự trong câu SQL
+            ps.setString(1, content);
+            ps.setInt(2, rating);
+            ps.setString(3, product_id);
+            ps.setString(4, user_id);
+            ps.setString(5, image_url);
+
+            result = ps.executeUpdate();
+            
+            // Đóng kết nối (Nên có thói quen đóng PreparedStatement và Connection để tránh tràn bộ nhớ)
+            ps.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Lỗi khi thêm bình luận: " + e.getMessage());
+        }
+        return result > 0;
+    }
 }

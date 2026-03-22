@@ -46,6 +46,7 @@ public class MainController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
 
         String action = request.getParameter("action");
         System.out.println("action ở MainController: " + action);
@@ -82,6 +83,8 @@ public class MainController extends HttpServlet {
                 url = "login.jsp";
             } else if ("sendCode".equals(action) || "verifyCode".equals(action) || "resetPassword".equals(action)) {
                 url = "ForgotPasswordController";
+            } else if (action.contains("Review")){
+                url = "ProductReviewController";
             } else if (action.equals("updateUser")) {
                 url = "UserController";
             } else if (action.equals("updateProduct")) {
@@ -187,6 +190,50 @@ public class MainController extends HttpServlet {
                 paymentImgPath = "assets/img/payment_image/" + uniqueFileName;
                 request.setAttribute("receipt", paymentImgPath);
                 System.out.println("Đường dẫn lưu Database: " + paymentImgPath);
+            }
+        } else if (request.getParameter("action").equals("commentReview")) {
+            // TRƯỜNG HỢP UPLOAD ẢNH CHO ĐÁNH GIÁ (REVIEW)
+            String reviewImgPath = null;
+            Part filePart = request.getPart("reviewImage"); 
+
+            // Kiểm tra xem khách có đính kèm ảnh khi đánh giá không
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+
+                // 1. ĐƯỜNG DẪN ẢO CỦA SERVER (Thay đổi thư mục thành review_image)
+                String serverPath = getServletContext().getRealPath("/") + "assets" + File.separator + "img" + File.separator + "review_image";
+                File serverDir = new File(serverPath);
+                if (!serverDir.exists()) serverDir.mkdirs();
+
+                // 2. ĐƯỜNG DẪN GỐC TRÊN MÁY BẠN (Thay đổi thư mục thành review_image)
+                String sourcePath = "C:\\Users\\AD\\Documents\\GitHub\\PRJ302-FGearWeb\\FGearWeb\\web\\assets\\img\\review_image";
+                File sourceDir = new File(sourcePath);
+                if (!sourceDir.exists()) sourceDir.mkdirs();
+
+                // TIẾN HÀNH LƯU ẢNH VÀO SERVER TRƯỚC
+                String fullServerFilePath = serverPath + File.separator + uniqueFileName;
+                filePart.write(fullServerFilePath);
+
+                // COPY ẢNH VỀ SOURCE GỐC ĐỂ BACKUP
+                String fullSourceFilePath = sourcePath + File.separator + uniqueFileName;
+                try {
+                    java.nio.file.Files.copy(
+                        Paths.get(fullServerFilePath), 
+                        Paths.get(fullSourceFilePath), 
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                    );
+                    System.out.println("Đã backup ảnh Review an toàn vào Source code!");
+                } catch (Exception e) {
+                    System.out.println("Lỗi khi backup ảnh Review: " + e.getMessage());
+                }
+
+                // Chuẩn bị đường dẫn để lưu xuống Database
+                reviewImgPath = "assets/img/review_image/" + uniqueFileName;
+                
+                // Set Attribute để lấy bên trong phương thức processRequest hoặc case "commentReview"
+                request.setAttribute("reviewImagePath", reviewImgPath);
+                System.out.println("Đường dẫn lưu Database (Review): " + reviewImgPath);
             }
         }
         processRequest(request, response);
