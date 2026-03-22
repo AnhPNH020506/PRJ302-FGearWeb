@@ -28,12 +28,11 @@ public class UserDAO {
 
         if (user != null) {
             String hashed = HashPasswordUtils.hashPassword(password);
-            
             if (user.getPassword().equals(hashed)) {
                 return user;
             }
         }
-
+        
         return null;
     }
 

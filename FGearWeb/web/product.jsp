@@ -414,31 +414,87 @@
         </div>
     </div>
             
-    <!-- Mục reviews -->
-    <%    
+    <!-- Mục review -->
+    <%  
         ProductReviewDAO prDao = new ProductReviewDAO();
         ArrayList<ProductReviewDTO> product_reviews = prDao.filterByName(product.getProduct_id());
         
         //hàm tính trung bình
         double avg = 0;
-        for (ProductReviewDTO prd_rv : product_reviews) {
-            avg += prd_rv.getRating();
+        if (product_reviews != null && !product_reviews.isEmpty()) {
+            for (ProductReviewDTO prd_rv : product_reviews) {
+                avg += prd_rv.getRating();
+            }
+            avg = avg / product_reviews.size();
+            // Làm tròn 1 chữ số thập phân nếu cần
+            avg = Math.round(avg * 10.0) / 10.0;
         }
-        avg = avg / product_reviews.size();
     %>
     <div class="container bg-white p-4 rounded shadow-sm mt-4 mb-4" style="max-width: 1200px;">
         <h2 class="h5 fw-bold mb-4">Đánh giá & Nhận xét <%= product.getName() %></h2>
 
-        <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
-            <div class="fw-bold me-3 text-dark" style="font-size: 48px; line-height: 1;"><%= avg %></div>
-            <div>
-                <div class="text-warning fs-5 mb-1">
-                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star" ></i><i class="fa-solid fa-star"></i>
+        <!-- Khối thống kê tổng quan -->
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom">
+            <div class="d-flex align-items-center">
+                <div class="fw-bold me-3 text-dark" style="font-size: 48px; line-height: 1;"><%= avg %></div>
+                <div>
+                    <div class="text-warning fs-5 mb-1">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <div class="text-muted" style="font-size: 14px;">(<%= product_reviews != null ? product_reviews.size() : 0 %> nhận xét)<i class="fa-regular fa-circle-question" style="margin-left: 4px;"></i></div>
                 </div>
-                <div class="text-muted" style="font-size: 14px;">(<%= product_reviews.size() %>)<i class="fa-regular fa-circle-question" style="margin-left: 4px;"></i></div>
             </div>
+            
+            <!-- Nút bật form đánh giá -->
+            <button class="btn text-white fw-bold px-4 py-2" style="background-color: var(--gearvn-red, #ff6600); border-radius: 4px;" onclick="toggleReviewForm()">
+                <i class="fa-solid fa-pen-to-square me-2"></i>Viết đánh giá
+            </button>
         </div>
 
+        <!-- FORM ĐÁNH GIÁ (ẨN MẶC ĐỊNH) -->
+        <div id="reviewFormContainer" class="mb-4 p-4 border rounded" style="display: none; background-color: #f8f9fa;">
+            <h5 class="fw-bold mb-3">Gửi đánh giá của bạn</h5>
+            <!-- Lưu ý: Nếu upload file (ảnh), cần thêm enctype="multipart/form-data" -->
+            <form action="MainController" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="commentReview">
+                <input type="hidden" name="productId" value="<%= product.getProduct_id() %>">
+                
+                <!-- Chọn số sao -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Chất lượng sản phẩm:</label>
+                    <div id="starRatingSelector" class="text-warning fs-3" style="cursor: pointer;">
+                        <!-- Mặc định chọn 5 sao -->
+                        <i class="fa-solid fa-star" data-value="1"></i>
+                        <i class="fa-solid fa-star" data-value="2"></i>
+                        <i class="fa-solid fa-star" data-value="3"></i>
+                        <i class="fa-solid fa-star" data-value="4"></i>
+                        <i class="fa-solid fa-star" data-value="5"></i>
+                    </div>
+                    <!-- Ô hidden này sẽ chứa giá trị int từ 1-5 gửi xuống server -->
+                    <input type="hidden" name="ratingValue" id="ratingValueInput" value="5">
+                </div>
+
+                <!-- Nhập nội dung -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nội dung đánh giá:</label>
+                    <textarea class="form-control" name="reviewContent" rows="4" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..." required></textarea>
+                </div>
+
+                <!-- Upload hình ảnh -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Thêm hình ảnh (không bắt buộc):</label>
+                    <input type="file" class="form-control" name="reviewImage" accept="image/*">
+                </div>
+
+                <!-- Cụm nút bấm -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn text-white fw-bold px-4" style="background-color: var(--gearvn-red, #ff6600);">Gửi đánh giá</button>
+                    <button type="button" class="btn btn-outline-secondary px-4" onclick="toggleReviewForm()">Hủy</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- DANH SÁCH BÌNH LUẬN CŨ -->
         <div class="review-list">
             <% 
                 // NẾU KHÔNG CÓ REVIEW NÀO
@@ -451,18 +507,14 @@
             <% 
                 // NẾU CÓ REVIEW TRONG DATABASE
                 } else { 
-                    // Chuẩn bị sẵn bộ format ngày tháng để dùng trong vòng lặp
                     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                    
                     for (ProductReviewDTO rev : product_reviews) { 
-                        // Format ngày tháng
                         String formattedDate = rev.getCreated_at() != null ? sdf.format(rev.getCreated_at()) : "";
-                        // Lấy chữ cái đầu tiên của user_id làm Avatar (ví dụ: US001 -> U)
                         String avatarChar = (rev.getUser_id() != null && rev.getUser_id().length() > 0) ? rev.getUser_id().substring(0, 1).toUpperCase() : "U";
             %>
             
             <div class="d-flex gap-3 mb-4 pb-4 border-bottom">
-                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 45px; height: 45px; font-size: 16px; background-color: #e2e8f0; color: #475569;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 45px; height: 45px; font-size: 16px; background-color: #e2e8f0; color: #475569;">
                     <%= avatarChar %>
                 </div>
                 
@@ -470,24 +522,20 @@
                     <div class="d-flex align-items-center mb-1" style="font-size: 14px;">
                         <span class="fw-bold text-dark me-2"><%= rev.getUsername() %></span>
                         <span class="text-muted me-2">| <%= formattedDate %> |</span>
-                        
                     </div>
                     
                     <div class="d-flex align-items-center mb-2">
                         <div class="text-warning me-2" style="font-size: 13px;">
-                            <%-- Vòng lặp in sao dựa trên rating thực tế --%>
                             <% for(int i=1; i<=5; i++) { 
                                 if(i <= rev.getRating()) { %>
                                     <i class="fa-solid fa-star"></i>
                                 <% } else { %>
                                     <i class="fa-regular fa-star"></i>
-                            <%  
-                                    } 
+                            <%      } 
                                 } 
                             %>
                         </div>
                         <span class="fw-bold text-dark" style="font-size: 14px;">
-                            <%-- Gợi ý tiêu đề dựa theo sao --%>
                             <%= rev.getRating() >= 4 ? "Cực kì hài lòng" : (rev.getRating() == 3 ? "Bình thường" : "Không hài lòng") %>
                         </span>
                     </div>
@@ -585,5 +633,6 @@
     <script src="assets/js/script2.js"></script>
     <script src="assets/js/script3.js"></script>
     <script src="assets/js/processBuyNow.js"></script>
+    <script src="assets/js/showReview.js"></script>
 </body>
 </html>

@@ -243,13 +243,14 @@ public class OrdersDAO {
         }
         return result > 0;
     }
-    public OrdersDTO findOrderByProductId(String product_id_param) { 
+    public OrdersDTO findOrderByProductId(String product_id_param, String user_id_param) { 
         OrdersDTO res = null;
         try {
             Connection conn = DbUtils.getConnection();
-            String sql = "SELECT * FROM orders WHERE product_id=?";
+            String sql = "SELECT * FROM orders WHERE product_id=? and user_id= ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, product_id_param);
+            pst.setString(1, user_id_param);
             ResultSet rs =  pst.executeQuery();
             while(rs.next()){
                 // Truy xuất dữ liệu từ ResultSet dựa theo các field của OrdersDTO

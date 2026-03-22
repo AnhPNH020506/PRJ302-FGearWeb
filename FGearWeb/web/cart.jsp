@@ -89,10 +89,20 @@
                         ProductDAO pDao = new ProductDAO();
                         OrdersDAO oDao = new OrdersDAO();
                         ArrayList<OrdersDTO> orders = oDao.searchAllOrdersByUserId(user.getUserId());
-
-                        // Bắt đầu vòng lặp ở đây
-
+                        if (orders == null){
                     %>
+                    <!-- GIAO DIỆN KHI GIỎ HÀNG TRỐNG -->
+                    <div class="text-center py-5">
+                        <!-- Icon giỏ hàng (sử dụng FontAwesome giống với icon thùng rác của bạn) -->
+                        <i class="fa-solid fa-cart-plus mb-3" style="font-size: 5rem; color: #dee2e6;"></i>
+                        <h5 class="fw-bold mt-2" style="color: #333;">Giỏ hàng của bạn đang trống</h5>
+                        <p class="text-muted mb-4">Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
+                        <!-- Nút điều hướng về trang chủ / trang sản phẩm -->
+                        <a href="index.jsp" class="btn text-white fw-bold px-4 py-2" style="background-color: var(--gearvn-red, #ff6600); border-radius: 4px;">
+                            Tiếp tục mua sắm
+                        </a>
+                    </div> 
+                    <% } else { %>
                     <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
                         <h4 class="fw-bold m-0" style="color: #333;">Giỏ hàng của tôi</h4>
                         <span class="text-muted"><%= orders.size() %> đơn hàng</span>
@@ -139,12 +149,16 @@
                                                 <!-- Nút Cộng -->
                                                 <a href="MainController?action=increaseAmountPrdOrder&orderId=<%= ord.getOrder_id() %>" class="btn btn-outline-secondary">+</a>
                                             </div>
-
+                                            
                                             <div class="d-flex gap-2">
                                                 <!-- Nút xóa (Bạn có thể bọc Form hoặc gắn href chứa Order ID để gọi Controller xử lý xóa) -->
+                                                <%
+                                                    if(!ord.getOrder_status().equals("CONFIRMED")){
+                                                %>
                                                 <a href="MainController?action=deleteOrder&orderId=<%= ord.getOrder_id() %>" class="btn btn-sm btn-outline-secondary border-0" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?');">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </a>
+                                                <% } %>
 
                                                 <!-- Nút Mua hàng riêng lẻ -->
                                                 <%
@@ -184,9 +198,9 @@
                     <%
                             } // Đóng if (prd != null)
                         } // Đóng vòng lặp for
+                    } //đóng if check orders
                     %>
                 </div>
-
         <%
             } else { 
                 // NẾU USER NULL, CHỈ HIỂN THỊ DÒNG CHỮ NÀY, KHÔNG CÓ BẤT KỲ THẺ DIV NÀO KHÁC
