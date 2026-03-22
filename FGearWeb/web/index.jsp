@@ -136,10 +136,7 @@
         <!-- 2. MAIN LAYOUT (3 Cột: Banner - Content - Banner) -->
         <div class="main-wrapper pb-5">
 
-            <!-- Banner Trái -->
-            <aside class="side-banner">
-                Banner Trái
-            </aside>
+            
 
             <!-- Main Content (Container chính giữa) -->
             <div class="container" style="max-width: 1200px;">
@@ -512,13 +509,9 @@
                     </div>
                 </section>
             </div>
-            <aside class="side-banner">Banner Phải</aside>
         </div>
 
-        <!-- Banner Phải -->
-        <aside class="side-banner">
-            Banner Phải
-        </aside>
+        
 
     </div>
 
