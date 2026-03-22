@@ -60,7 +60,6 @@ public class OrderController extends HttpServlet {
     
     protected void doAddProductToOrderGioHang(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //
         String error = "";
         String msg = "" ;
         String product_id = (String)request.getParameter("productId");
@@ -68,7 +67,7 @@ public class OrderController extends HttpServlet {
         System.out.println("CHECK THỬ PRODUCT ID TRONG ORDERCONTROLLER NÈ: " + product_id + " " + user_id);
         
         OrdersDAO odao = new OrdersDAO();
-        OrdersDTO testFinding = odao.findOrderByProductId(product_id);
+        OrdersDTO testFinding = odao.findOrderByProductId(product_id, user_id);
         System.out.println(testFinding);
         if (testFinding == null) {
             if (odao.addOrder(user_id, product_id)) {
