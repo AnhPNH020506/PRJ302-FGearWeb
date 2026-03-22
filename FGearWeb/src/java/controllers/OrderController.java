@@ -95,20 +95,129 @@ public class OrderController extends HttpServlet {
         response.sendRedirect(redirectUrl);
         return;
     }
+    protected void doUpdateAmount(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String order_id = (String)request.getParameter("orderId");
+        String action = (String)request.getParameter("action");
+        String url = "";
+        System.out.println(order_id);
+        
+        OrdersDAO oDao = new OrdersDAO();
+        if (action.equals("decreaseAmountPrdOrder")) {
+            if(oDao.findSpecificOrderById(order_id).getQuantity() >= 2) {
+                if(oDao.decreaseQuantity(order_id)) System.out.println("Update increse thành công");
+                url = "cart.jsp";
+            }
+            url = "cart.jsp";
+        } else if (action.equals("increaseAmountPrdOrder")) {
+            if(oDao.increseQuantity(order_id)) System.out.println("Update decrease thành công");
+            url = "cart.jsp";
+        } 
+        
+        RequestDispatcher rd = request.getRequestDispatcher(url);
+        rd.forward(request, response);
+    }
     
+    protected void doDeleteOrder(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String order_id = (String)request.getParameter("orderId");
+        String url = "";
+        
+        OrdersDAO oDao = new OrdersDAO();
+        if (oDao.deleteOrder(order_id)){
+            System.out.println("Delete thành công order");
+            url = "cart.jsp";
+        }
+        
+        RequestDispatcher rd = request.getRequestDispatcher(url);
+        rd.forward(request, response);
+    }
     
+    protected void updateOrderStatus(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String order_id = (String)request.getParameter("orderId");
+        String paymentMethod = (String)request.getParameter("paymentMethod");
+        String shipping_address = (String)request.getParameter("shippingAddress");
+        String receipt = (String)request.getAttribute("receipt"); 
+        String url = "";
+        
+        OrdersDAO oDao = new OrdersDAO();
+        if (paymentMethod.equals("COD")){
+            if(oDao.updateCODStatus(order_id, shipping_address)){
+                System.out.println("Update COD thành công");
+                url = "cart.jsp";
+            }
+        } else if (paymentMethod.equals("BANK")){
+            if(oDao.updateBANKStatus(order_id, shipping_address, receipt)) {
+                System.out.println("Update BANK thành công");
+                url = "cart.jsp";
+            }
+        }
+        
+        RequestDispatcher rd = request.getRequestDispatcher(url);
+        rd.forward(request, response);
+    }
+    protected void doBuyNow(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String product_id = (String)request.getParameter("productId");
+        String user_id = (String)request.getParameter("userId");
+        String payment_method = (String)request.getParameter("paymentMethod");
+        String shipping_address = (String)request.getParameter("shippingAddress");
+        String receipt = (String)request.getAttribute("receipt"); 
+        String url = ""; //product.jsp
+        String msg = "";
+        String error = "";
+        
+        OrdersDAO oDao = new OrdersDAO();
+        if(payment_method.equals("COD")) {
+            if(oDao.addCODOrder(product_id, user_id, shipping_address)){
+                System.out.println("ĐÃ MUA HÀNG THÀNH CÔNG");
+                url = "index.jsp";
+                msg = "Mua hàng thành công";
+            } else {
+                System.out.println("MUA HÀNG THẤT BẠI");
+                error = "Mua hàng thất bại";
+            }
+        } else if (payment_method.equals("BANK")){
+//            System.out.println("product_id: " + product_id);
+//            System.out.println("user_id: " + user_id);
+//            System.out.println("shipping_address: " + shipping_address);
+//            System.out.println("receipt: " + receipt);
+            if(oDao.addBANKOrder(product_id, user_id, shipping_address, receipt)){
+                System.out.println("ĐÃ MUA HÀNG THÀNH CÔNG");
+                url = "index.jsp";
+                msg = "Mua hàng thành công";
+            } else {
+                System.out.println("MUA HÀNG THẤT BẠI");
+                error = "Mua hàng thất bại";
+            }
+        }
+        
+        request.setAttribute("error", error);
+        request.setAttribute("msg", msg);
+        RequestDispatcher rd = request.getRequestDispatcher(url);
+        rd.forward(request, response);
+    }
+  
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         
-         
         String action = request.getParameter("action");
         if(action.equals("addNewOrderMuaNgay")){
             doAddNewOrderMuaNgay(request,response);
         } else if (action.equals("addProductToOrderGioHang")){
             doAddProductToOrderGioHang(request,response);
+        } else if (action.equals("decreaseAmountPrdOrder") || action.equals("increaseAmountPrdOrder")) {
+            doUpdateAmount(request, response);
+        } else if (action.equals("deleteOrder")){
+            doDeleteOrder(request, response);
+        } else if (action.equals("updateOrderStatus")){
+            updateOrderStatus(request, response);
+        } else if (action.equals("processOrderBuyNow")) {
+            doBuyNow(request,response);
         }
     }
 

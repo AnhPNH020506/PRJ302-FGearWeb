@@ -259,7 +259,13 @@
                                 <input type="hidden" name="action" value="addNewOrderMuaNgay">
                                 <input type="hidden" name="productId" value="<%= product.getProduct_id() %>"> 
                                 <input type="hidden" name="userId" value="<%= curUser.getUserId() %>"> 
-                                <button type="submit" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="background-color: #f36f21; color: white; border: none;">
+                                <!-- Nút MUA NGAY -->
+                                <button type="button" class="btn btn-buy-now w-100 h-100 d-flex flex-column align-items-center justify-content-center py-2" style="border-width: 2px; color: white; background-color: #f36f21"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#buyNowModal"
+                                        data-product-id="<%= product.getProduct_id() %>"
+                                        data-product-name="<%= product.getName() %>"
+                                        data-price="<%= product.getFormattedPrice() %>">
                                     <span class="fw-bold fs-5">MUA NGAY</span>
                                     <span class="fw-normal" style="font-size: 11px;">Giao tận nơi/Nhận tại cửa hàng</span>
                                 </button>
@@ -503,10 +509,81 @@
             %>
         </div>
     </div>
+        
+    <!-- Modal Mua Ngay -->
+    <div class="modal fade" id="buyNowModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">Xác nhận Mua Ngay</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <!-- Form gửi thẳng về MainController -->
+          <form action="MainController" method="POST" enctype="multipart/form-data">
+            <div class="modal-body">
+                <!-- Đổi action thành processBuyNow để Controller biết đây là luồng mua trực tiếp -->
+                <input type="hidden" name="action" value="processOrderBuyNow">
+                <!-- Thẻ ẩn chứa Product ID -->
+                <input type="hidden" name="productId" id="modalProductId" value="">
+                <input type="hidden" name="userId" value="<%= curUser.getUserId()%>">
+                <p>Bạn đang mua sản phẩm:</p>
+                <h6 id="modalBuyNowProductName" class="fw-bold text-primary"></h6>
+                <div class="d-flex justify-content-between mt-3">
+                    <span>Giá sản phẩm:</span>
+                    <span id="modalBuyNowPrice" class="fw-bold fs-5" style="color: var(--gearvn-red, #ff6600);"></span>
+                </div>
+
+                <hr>
+                <div class="mb-3">
+                    <label for="shippingAddress" class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="shippingAddress" name="shippingAddress" rows="2" placeholder="Nhập số nhà, tên đường, phường/xã, quận/huyện..." required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phương thức thanh toán</label>
+                    <select class="form-select" name="paymentMethod" id="paymentMethodSelect">
+                        <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+                        <option value="BANK">Chuyển khoản ngân hàng</option>
+                    </select>
+                </div>
+            
+                <div id="qrSection" class="mb-3 d-none text-center bg-light p-3 rounded border">
+                    <p class="mb-2 fw-bold" style="color: var(--gearvn-red, #ff6600);">Quét mã QR để thanh toán</p>
+
+                    <!-- Ảnh QR của bạn -->
+                    <img src="${pageContext.request.contextPath}/assets/img/qr_payment.png" class="img-fluid border p-1 mb-3" style="max-width: 200px;" alt="QR Code">
+
+                    <!-- Nút Upload ảnh -->
+                    <div class="text-start">
+                        <div class="text-start">
+                            <label class="form-label fw-bold">Tải lên biên lai chuyển khoản <span class="text-danger">*</span></label>
+                            <!-- 1. Nút bấm GIẢ (Dùng Label trang trí thành nút Bootstrap) -->
+                            <label for="receiptImage" class="btn btn-outline-secondary d-block" style="cursor: pointer; border-style: dashed;">
+                                Upload ảnh
+                            </label>
+                            <!-- 2. Thẻ input THẬT bị ẩn đi bằng class d-none -->
+                            <input class="d-none" type="file" id="receiptImage" name="receiptImage" accept="image/*">
+                            <!-- 3. Nơi hiển thị tên file sau khi khách đã chọn xong -->
+                            <div id="fileNameDisplay" class="text-muted mt-1" style="font-size: 13px; font-style: italic;">
+                                Chưa có file nào được chọn
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn text-white fw-bold" style="background-color: var(--gearvn-red, #ff6600);">Xác nhận Mua</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/script2.js"></script>
     <script src="assets/js/script3.js"></script>
+    <script src="assets/js/processBuyNow.js"></script>
 </body>
 </html>

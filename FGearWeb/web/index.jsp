@@ -125,6 +125,13 @@
     <body>
         <!-- 1. HEADER (Sử dụng Flexbox Utilities của Bootstrap) -->
         <jsp:include page="header.jsp" />
+        
+        <div style="color:${not empty param.error ? 'red' : 'green'}; text-align:center; margin-bottom:10px;">
+            <bold>${not empty param.error ? param.error : param.msg}</bold>
+        </div>
+        <div style="color:${not empty error ? 'red' : 'green'}; text-align:center; margin-bottom:10px;">
+            <bold>${not empty error ? error : msg}</bold>
+        </div>
 
         <!-- 2. MAIN LAYOUT (3 Cột: Banner - Content - Banner) -->
         <div class="main-wrapper pb-5">
