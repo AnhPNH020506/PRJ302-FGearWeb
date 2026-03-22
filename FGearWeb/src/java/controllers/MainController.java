@@ -54,7 +54,7 @@ public class MainController extends HttpServlet {
             url = "index.jsp"; 
         } else {
             // Dùng so sánh ngược: "chuỗi".equals(biến) để không bao giờ bị NullPointer
-            if (action.contains("Product")) {
+            if (action.contains("Product") && !action.contains("Order")) {
                 url = "ProductController";
             } else if (action.contains("Order")) {
                 url = "OrderController";
