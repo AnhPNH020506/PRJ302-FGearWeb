@@ -214,11 +214,7 @@
         <div class="breadcrumb-custom mb-3">
             <a href="http://localhost:8080/FGearWeb"><i class="fa-solid fa-house"></i> Trang chủ</a> 
             <span class="text-muted mx-1">/</span> 
-            <% if (product != null) { %>
             <span class="text-muted"><%= product.getSlug() %></span>
-            <% } else {
-                }
-            %>
         </div>
 
         <div class="row">
@@ -450,21 +446,9 @@
             </div>
             
             <!-- Nút bật form đánh giá -->
-            <%
-                if(curUser != null) { //đã đăng nhập có user
-            %>
             <button class="btn text-white fw-bold px-4 py-2" style="background-color: var(--gearvn-red, #ff6600); border-radius: 4px;" onclick="toggleReviewForm()">
                 <i class="fa-solid fa-pen-to-square me-2"></i>Viết đánh giá
             </button>
-            <% } else { //chưa đăng nhập %>
-            <form action="MainController" method="POST">
-                <input type="hidden" name="action" value="requireLoginUser">
-                <input type="hidden" name="productid" value="<%= product.getProduct_id() %>">
-                <button class="btn text-white fw-bold px-4 py-2" style="background-color: var(--gearvn-red, #ff6600); border-radius: 4px;" onclick="toggleReviewForm()">
-                    <i class="fa-solid fa-pen-to-square me-2"></i>Viết đánh giá
-                </button>
-            </form>
-            <% } %>
         </div>
 
         <!-- FORM ĐÁNH GIÁ (ẨN MẶC ĐỊNH) -->
@@ -474,9 +458,6 @@
             <form action="MainController" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="commentReview">
                 <input type="hidden" name="productId" value="<%= product.getProduct_id() %>">
-                <% if (curUser != null) { %>
-                <input type="hidden" name="user_id" value="<%= curUser.getUserId() %>">
-                <% } %>
                 
                 <!-- Chọn số sao -->
                 <div class="mb-3">
@@ -564,12 +545,8 @@
                     </div>
                     
                     <% if (rev.getImage_url() != null && !rev.getImage_url().trim().isEmpty()) { %>
-                    <div class="d-flex gap-2 mt-2">
-                        <!-- Thêm onclick="openImageModal(...)" vào thẻ img -->
-                        <img src="<%= rev.getImage_url() %>" 
-                             class="rounded border" 
-                             style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
-                             onclick="openImageModal('<%= rev.getImage_url() %>')">
+                    <div class="d-flex gap-2">
+                        <img src="<%= rev.getImage_url() %>" class="rounded border" style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;">
                     </div>
                     <% } %>
                     
@@ -579,18 +556,6 @@
                 } // Đóng thẻ else 
             %>
         </div>
-    </div>
-        
-    <!-- KHUNG HIỂN THỊ ẢNH PHÓNG TO (LIGHTBOX) -->
-    <div id="imageLightboxOverlay" 
-         style="display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center; cursor: zoom-out;" 
-         onclick="closeImageModal()">
-
-        <!-- Nút X tắt -->
-        <span style="position: absolute; top: 20px; right: 40px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
-
-        <!-- Nơi chứa ảnh sẽ được zoom -->
-        <img id="enlargedImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
     </div>
         
     <!-- Modal Mua Ngay -->
@@ -609,9 +574,7 @@
                 <input type="hidden" name="action" value="processOrderBuyNow">
                 <!-- Thẻ ẩn chứa Product ID -->
                 <input type="hidden" name="productId" id="modalProductId" value="">
-                <% if (curUser != null) { %>
                 <input type="hidden" name="userId" value="<%= curUser.getUserId()%>">
-                <% } %>
                 <p>Bạn đang mua sản phẩm:</p>
                 <h6 id="modalBuyNowProductName" class="fw-bold text-primary"></h6>
                 <div class="d-flex justify-content-between mt-3">
@@ -671,6 +634,5 @@
     <script src="assets/js/script3.js"></script>
     <script src="assets/js/processBuyNow.js"></script>
     <script src="assets/js/showReview.js"></script>
-    <script src="assets/js/showImage.js"></script>
 </body>
 </html>
